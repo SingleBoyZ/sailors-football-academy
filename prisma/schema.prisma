@@ -1,0 +1,345 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  PARENT
+  ADMIN
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PlanType {
+  FULL
+  SIBLING_2
+  SIBLING_3
+  SPONSORED
+}
+
+enum Programme {
+  FOUNDATION
+  ADVANCE
+  PERFORMANCE
+}
+
+enum PaymentType {
+  REGISTRATION
+  MONTHLY_FEE
+  STORE_ORDER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+enum InvoiceStatus {
+  OPEN
+  PARTIAL
+  SETTLED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FULFILLED
+  CANCELLED
+}
+
+enum DeliveryMethod {
+  DELIVERY
+  PICKUP
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth v5) — standard Prisma adapter models, extended User
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  phone         String?
+  role          Role      @default(PARENT)
+  createdAt     DateTime  @default(now())
+
+  accounts Account[]
+  sessions Session[]
+
+  players               Player[]
+  orders                Order[]
+  reviewedApplications  Application[] @relation("ReviewedApplications")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Enrolment
+// ---------------------------------------------------------------------------
+
+model Application {
+  id     String            @id @default(cuid())
+  status ApplicationStatus @default(PENDING)
+
+  // Player details
+  playerName String
+  dob        DateTime
+  gender     String
+  school     String?
+  position   String?
+  experience String?
+
+  // Parent / guardian
+  guardianName  String
+  guardianPhone String
+  guardianEmail String
+  address       String
+
+  // Medical & consent
+  emergencyName  String
+  emergencyPhone String
+  medicalNotes   String?
+  photoConsent   Boolean
+
+  submittedAt      DateTime  @default(now())
+  reviewedAt       DateTime?
+  reviewedById     String?
+  reviewedBy       User?     @relation("ReviewedApplications", fields: [reviewedById], references: [id])
+  rejectionReason  String?
+
+  playerId String?  @unique
+  player   Player?  @relation(fields: [playerId], references: [id])
+
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Players, fees & payments
+// ---------------------------------------------------------------------------
+
+model Player {
+  id               String    @id @default(cuid())
+  memberCode       String    @unique
+  name             String
+  dob              DateTime
+  ageGroup         String
+  programme        Programme
+  plan             PlanType  @default(FULL)
+  /// Monthly fee in sen — derived from `plan` at approval time, overridable per player.
+  monthlyFee       Int
+  registrationPaid Boolean   @default(false)
+  guardianId       String
+  guardian         User      @relation(fields: [guardianId], references: [id])
+  active           Boolean   @default(true)
+  joinedAt         DateTime  @default(now())
+  notes            String?
+
+  application Application?
+  invoices    Invoice[]
+  payments    Payment[]
+
+  @@index([guardianId])
+}
+
+model Invoice {
+  id          String        @id @default(cuid())
+  playerId    String
+  player      Player        @relation(fields: [playerId], references: [id])
+  type        PaymentType
+  periodMonth Int
+  periodYear  Int
+  /// Amount owed, in sen.
+  amountDue   Int
+  /// Amount settled so far, in sen.
+  amountPaid  Int           @default(0)
+  dueDate     DateTime
+  status      InvoiceStatus @default(OPEN)
+  createdAt   DateTime      @default(now())
+
+  allocations PaymentAllocation[]
+
+  @@unique([playerId, type, periodMonth, periodYear])
+  @@index([status])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  playerId      String?
+  player        Player?       @relation(fields: [playerId], references: [id])
+  orderId       String?
+  order         Order?        @relation(fields: [orderId], references: [id])
+  type          PaymentType
+  /// Total amount collected in this single Billplz bill, in sen.
+  amount        Int
+  status        PaymentStatus @default(PENDING)
+  billplzBillId String        @unique
+  billplzUrl    String
+  paidAt        DateTime?
+  payerName     String
+  payerEmail    String
+  receiptNo     String?       @unique
+  receiptSentAt DateTime?
+  rawCallback   Json?
+  createdAt     DateTime      @default(now())
+
+  allocations PaymentAllocation[]
+
+  @@index([status])
+}
+
+/// A fee Payment can settle more than one Invoice (e.g. registration +
+/// first month together) — this join table records exactly how much of a
+/// Payment was applied to each Invoice, oldest-first. Store order payments
+/// don't use this table.
+model PaymentAllocation {
+  id        String  @id @default(cuid())
+  paymentId String
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  amountSen Int
+
+  @@index([paymentId])
+  @@index([invoiceId])
+}
+
+// ---------------------------------------------------------------------------
+// Store
+// ---------------------------------------------------------------------------
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  category    String
+  priceSen    Int
+  images      String[]
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  variants ProductVariant[]
+}
+
+model ProductVariant {
+  id               String  @id @default(cuid())
+  productId        String
+  product          Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label            String
+  sku              String  @unique
+  stock            Int     @default(0)
+  priceOverrideSen Int?
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id            String         @id @default(cuid())
+  orderNo       String         @unique
+  userId        String?
+  user          User?          @relation(fields: [userId], references: [id])
+  customerName  String
+  email         String
+  phone         String
+  deliveryMethod DeliveryMethod @default(PICKUP)
+  /// Malaysian delivery address (or null for pickup) — { line1, line2?, city, state, postcode }
+  address       Json?
+  subtotalSen   Int
+  shippingSen   Int
+  totalSen      Int
+  status        OrderStatus    @default(PENDING)
+  billplzBillId String?
+  billplzUrl    String?
+  paidAt        DateTime?
+  createdAt     DateTime       @default(now())
+
+  items    OrderItem[]
+  payments Payment[]
+
+  @@index([status])
+}
+
+model OrderItem {
+  id           String         @id @default(cuid())
+  orderId      String
+  order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId    String
+  variant      ProductVariant @relation(fields: [variantId], references: [id])
+  productName  String
+  variantLabel String
+  qty          Int
+  unitPriceSen Int
+}
+
+// ---------------------------------------------------------------------------
+// Content & config
+// ---------------------------------------------------------------------------
+
+model SuccessStory {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  playerName String
+  ageGroup   String
+  quote      String
+  body       String
+  image      String
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+/// Free-form admin-editable settings (fee amounts, shipping fee, WhatsApp
+/// number, banner text) keyed by name, e.g. Setting["shippingSen"].value = 800
+model Setting {
+  key   String @id
+  value Json
+}

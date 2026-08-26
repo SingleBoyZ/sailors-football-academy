@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/*
+ * Brand tokens for Sailors Football Academy.
+ * Light-first palette — dark is reserved for contrast bands, nav and footer only.
+ */
+:root {
+  --color-brand-red: #e8232a;
+  --color-brand-red-dark: #c01820;
+  --color-brand-ink: #0f0f10;
+  --color-brand-white: #ffffff;
+  --color-brand-sand: #f7f5f2;
+  --color-brand-muted: #5b5b60;
+  --color-brand-success: #1f9d55;
+  --color-brand-warning: #d97706;
+
+  --background: var(--color-brand-sand);
+  --foreground: var(--color-brand-ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-brand-red: var(--color-brand-red);
+  --color-brand-red-dark: var(--color-brand-red-dark);
+  --color-brand-ink: var(--color-brand-ink);
+  --color-brand-white: var(--color-brand-white);
+  --color-brand-sand: var(--color-brand-sand);
+  --color-brand-muted: var(--color-brand-muted);
+  --color-brand-success: var(--color-brand-success);
+  --color-brand-warning: var(--color-brand-warning);
+
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-jakarta), "Segoe UI", sans-serif;
+
+  --animate-marquee: marquee 22s linear infinite;
+  --animate-bob: bob 2.4s ease-in-out infinite;
+  --animate-draw: draw 1.4s ease forwards;
+
+  --breakpoint-xs: 30rem;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--dash-length, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+/* Diagonal kit-stripe motif, used sparingly as a section accent */
+.stripe-diagonal {
+  background-image: repeating-linear-gradient(
+    115deg,
+    var(--color-brand-red) 0px,
+    var(--color-brand-red) 28px,
+    transparent 28px,
+    transparent 56px
+  );
+}
+
+/* Rope/wave section divider */
+.divider-wave {
+  height: 1.5rem;
+  background-image: radial-gradient(
+    circle at 10px -6px,
+    transparent 12px,
+    var(--color-brand-ink) 13px
+  );
+  background-size: 24px 24px;
+  background-repeat: repeat-x;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Ship's-wheel radial spoke pattern, low-opacity background texture */
+.pattern-wheel {
+  background-image: conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--color-brand-red) 10%, transparent) 0deg 15deg,
+    transparent 15deg 45deg
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--color-brand-red);
+  color: var(--color-brand-white);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brand-red);
+  outline-offset: 2px;
+}

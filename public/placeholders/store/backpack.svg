@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" role="img" aria-label="BACKPACK product placeholder">
+  <rect width="900" height="900" fill="#f7f5f2" />
+  <rect x="40" y="40" width="820" height="820" fill="none" stroke="#0f0f10" stroke-width="2" stroke-dasharray="10 8" />
+  <circle cx="450" cy="390" r="110" fill="none" stroke="#e8232a" stroke-width="6" />
+  <text x="450" y="400" font-family="Arial, sans-serif" font-weight="800" font-size="34" fill="#0f0f10" text-anchor="middle">SFA</text>
+  <text x="450" y="590" font-family="Arial, sans-serif" font-weight="700" font-size="40" fill="#0f0f10" text-anchor="middle">BACKPACK</text>
+  <text x="450" y="640" font-family="Arial, sans-serif" font-weight="500" font-size="22" fill="#e8232a" text-anchor="middle" letter-spacing="3">PRODUCT PHOTO PLACEHOLDER</text>
+</svg>
