@@ -136,6 +136,33 @@ h4,
   }
 }
 
+/* Minimal prose styling for legal/long-form pages — no typography plugin needed. */
+.prose-content h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.prose-content p {
+  margin-bottom: 1rem;
+  color: var(--color-brand-muted);
+  line-height: 1.7;
+}
+.prose-content ul {
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+  color: var(--color-brand-muted);
+  line-height: 1.7;
+}
+.prose-content li {
+  margin-bottom: 0.4rem;
+}
+.prose-content li::marker {
+  color: var(--color-brand-red);
+}
+
 ::selection {
   background: var(--color-brand-red);
   color: var(--color-brand-white);
