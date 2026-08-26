@@ -70,12 +70,12 @@ export function Footer() {
           >
             <MessageCircle className="h-4 w-4" /> {SITE.contact.whatsappDisplay}
           </a>
-          <div className="mt-2 flex flex-col gap-1">
+          <div className="mt-2 flex flex-col">
             {LEGAL_LINKS.map((link) => (
               <TransitionLink
                 key={link.href}
                 href={link.href}
-                className="text-brand-white/50 hover:text-brand-red-light text-xs transition-colors"
+                className="text-brand-white/50 hover:text-brand-red-light py-1.5 text-xs transition-colors"
               >
                 {link.label}
               </TransitionLink>

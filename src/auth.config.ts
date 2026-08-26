@@ -12,6 +12,10 @@ import type { Role } from "@prisma/client";
 export const authConfig: NextAuthConfig = {
   pages: { signIn: "/login" },
   session: { strategy: "jwt" },
+  // Vercel (and most reverse-proxy hosts) forward the original Host header,
+  // which Auth.js v5 rejects by default in production unless explicitly
+  // trusted — see https://errors.authjs.dev#untrustedhost.
+  trustHost: true,
   providers: [Google],
   callbacks: {
     jwt({ token, user }) {
