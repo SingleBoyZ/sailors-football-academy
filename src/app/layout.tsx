@@ -9,6 +9,7 @@ import { RouteTransitionOverlay } from "@/components/motion/RouteTransitionOverl
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider";
 
 const anton = Anton({
   variable: "--font-anton",
@@ -52,13 +53,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${anton.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-sand text-brand-ink">
-        <SmoothScroll />
-        <Preloader />
-        <RouteTransitionOverlay />
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CartDrawer />
+        <AuthSessionProvider>
+          <SmoothScroll />
+          <Preloader />
+          <RouteTransitionOverlay />
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <CartDrawer />
+        </AuthSessionProvider>
       </body>
     </html>
   );

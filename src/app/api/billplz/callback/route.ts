@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { verifyCallbackSignature } from "@/lib/billplz";
 import { sendEmail } from "@/lib/email";
+import { settleFeePayment } from "@/lib/fees";
 import OrderConfirmation from "@/emails/OrderConfirmation";
 
 /**
@@ -61,8 +62,10 @@ export async function POST(request: Request) {
       return { kind: "order" as const, order };
     }
 
-    // Fee (REGISTRATION / MONTHLY_FEE) payments are allocated to invoices in
-    // the parent-portal payment flow — see lib/fees.ts.
+    if (payment.playerId) {
+      return { kind: "fee" as const, paymentId: payment.id };
+    }
+
     return null;
   });
 
@@ -80,6 +83,13 @@ export async function POST(request: Request) {
         deliveryMethod: outcome.order.deliveryMethod,
       }),
     });
+  }
+
+  if (outcome?.kind === "fee") {
+    // Allocation, receipt numbering and the receipt email all happen here —
+    // deliberately outside the transaction above so PDF rendering and the
+    // Resend API call never hold a DB transaction open.
+    await settleFeePayment(outcome.paymentId);
   }
 
   return new Response("OK", { status: 200 });

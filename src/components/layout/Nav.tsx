@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { TransitionLink } from "@/components/motion/TransitionLink";
 import { CartButton } from "@/components/cart/CartButton";
 import { Button } from "@/components/ui/Button";
@@ -37,6 +38,19 @@ function NavLink({ href, label, onNavigate }: { href: string; label: string; onN
   );
 }
 
+function AccountLink({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {
+  const { data: session } = useSession();
+  const href = session ? (session.user.role === "ADMIN" ? "/admin" : "/portal") : "/login";
+  const label = session ? (session.user.role === "ADMIN" ? "Admin" : "Portal") : "Login";
+
+  return (
+    <TransitionLink href={href} onClick={onNavigate} className={className}>
+      <User className="h-4 w-4" />
+      {label}
+    </TransitionLink>
+  );
+}
+
 export function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -59,6 +73,7 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <AccountLink className="hidden items-center gap-1.5 text-sm text-brand-white/75 hover:text-brand-white lg:flex" />
           <CartButton />
           <Button href="/enrol" size="md" className="hidden sm:inline-flex">
             Enrol Now
@@ -108,7 +123,13 @@ export function Nav() {
                 </StaggerItem>
               ))}
               <StaggerItem>
-                <Button href="/enrol" size="lg" className="mt-6 w-full" onClick={() => setMobileOpen(false)}>
+                <AccountLink
+                  className="text-brand-white/70 flex items-center gap-2 py-3 text-lg"
+                  onNavigate={() => setMobileOpen(false)}
+                />
+              </StaggerItem>
+              <StaggerItem>
+                <Button href="/enrol" size="lg" className="mt-2 w-full" onClick={() => setMobileOpen(false)}>
                   Enrol Now
                 </Button>
               </StaggerItem>
