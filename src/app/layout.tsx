@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { Anton, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/content/site";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { Preloader } from "@/components/motion/Preloader";
+import { RouteTransitionOverlay } from "@/components/motion/RouteTransitionOverlay";
+import { Nav } from "@/components/layout/Nav";
+import { Footer } from "@/components/layout/Footer";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const anton = Anton({
   variable: "--font-anton",
@@ -45,7 +51,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${anton.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-sand text-brand-ink">
-        {children}
+        <SmoothScroll />
+        <Preloader />
+        <RouteTransitionOverlay />
+        <Nav />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <CartDrawer />
       </body>
     </html>
   );
