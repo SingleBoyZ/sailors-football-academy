@@ -45,6 +45,27 @@ Vitest + Playwright.
     check, Playwright smoke tests (home, add-to-cart→checkout, enrol submit),
     final README (deploy + go-live checklist) and closing summary.
 
+## Status: all phases complete
+
+1. Scaffold — done.
+2. Data & infra — done.
+3. Motion + shell — done.
+4. Content layer — done (folded into phases 1-2).
+5. Public pages — done (Home, Academy, Programmes, Training, Achievements,
+   Success Stories, legal pages).
+6. Store + cart + checkout + Billplz — done, with Vitest coverage for
+   pricing and signature verification.
+7. Enrolment — done.
+8. Auth + portal + fees — done, including PDF receipts.
+9. Admin panel — done (all nine sections from the brief).
+10. Polish — done: sitemap/robots/OG image, an accessibility contrast pass
+    verified with a real Lighthouse audit (90/100/100/100 mobile), and 3
+    Playwright smoke tests (1 passes standalone; 2 need a live seeded DB).
+
+See README.md for the full go-live checklist and deployment guide, and its
+"Assumptions and scope notes" section for every deliberate deviation from
+the brief's literal spec and why.
+
 ## Notes / assumptions carried into the build
 - No real photos/crest exist yet — placeholders + README manifest telling the
   client exactly what to drop in.
