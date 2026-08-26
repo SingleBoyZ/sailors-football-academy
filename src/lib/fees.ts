@@ -69,9 +69,62 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-function invoiceDescription(type: string, periodMonth: number, periodYear: number): string {
+export function invoiceDescription(type: string, periodMonth: number, periodYear: number): string {
   if (type === "REGISTRATION") return "Registration Fee";
   return `Monthly Fee — ${MONTH_NAMES[periodMonth - 1]} ${periodYear}`;
+}
+
+/**
+ * Renders and emails a PDF receipt for an already-PAID, already-allocated
+ * Payment. Shared by settleFeePayment (first send) and the admin "Resend
+ * receipt" action. Best-effort — logs and returns rather than throwing.
+ */
+export async function emailReceipt(paymentId: string): Promise<void> {
+  const payment = await prisma.payment.findUnique({
+    where: { id: paymentId },
+    include: { player: { include: { guardian: true } }, allocations: { include: { invoice: true } } },
+  });
+
+  if (!payment || !payment.player || payment.status !== "PAID" || !payment.receiptNo) {
+    console.error(`emailReceipt: payment ${paymentId} is not a settled fee payment`);
+    return;
+  }
+
+  try {
+    const pendingBalance = await getOutstandingForPlayer(payment.player.id);
+    const pdf = await renderReceiptPdf({
+      receiptNo: payment.receiptNo,
+      paidAt: payment.paidAt ?? payment.createdAt,
+      memberName: payment.player.name,
+      memberCode: payment.player.memberCode,
+      guardianName: payment.player.guardian.name ?? "",
+      guardianEmail: payment.player.guardian.email,
+      allocations: payment.allocations.map((a) => ({
+        description: invoiceDescription(a.invoice.type, a.invoice.periodMonth, a.invoice.periodYear),
+        amountSen: a.amountSen,
+      })),
+      amountPaidSen: payment.amount,
+      pendingBalanceSen: pendingBalance,
+      billplzBillId: payment.billplzBillId,
+    });
+
+    await sendEmail({
+      to: payment.player.guardian.email,
+      subject: `Receipt ${payment.receiptNo} — payment received`,
+      react: FeeReceipt({
+        guardianName: payment.player.guardian.name ?? "",
+        memberName: payment.player.name,
+        amountPaidSen: payment.amount,
+        pendingBalanceSen: pendingBalance,
+        receiptNo: payment.receiptNo,
+      }),
+      attachments: [{ filename: `${payment.receiptNo}.pdf`, content: pdf }],
+    });
+
+    await prisma.payment.update({ where: { id: payment.id }, data: { receiptSentAt: new Date() } });
+  } catch (error) {
+    console.error(`emailReceipt: failed for payment ${payment.id}`, error);
+  }
 }
 
 /**
@@ -92,50 +145,9 @@ export async function settleFeePayment(paymentId: string): Promise<void> {
     const receiptNo = await generateReceiptNo(tx, payment.paidAt ?? new Date());
     await tx.payment.update({ where: { id: payment.id }, data: { receiptNo } });
 
-    const [player, allocations, pendingBalance] = await Promise.all([
-      tx.player.findUniqueOrThrow({ where: { id: payment.playerId }, include: { guardian: true } }),
-      tx.paymentAllocation.findMany({ where: { paymentId: payment.id }, include: { invoice: true } }),
-      getOutstandingForPlayer(payment.playerId, tx),
-    ]);
-
-    return { payment, receiptNo, player, allocations, pendingBalance };
+    return true;
   });
 
   if (!committed) return;
-  const { payment, receiptNo, player, allocations, pendingBalance } = committed;
-
-  try {
-    const pdf = await renderReceiptPdf({
-      receiptNo,
-      paidAt: payment.paidAt ?? new Date(),
-      memberName: player.name,
-      memberCode: player.memberCode,
-      guardianName: player.guardian.name ?? "",
-      guardianEmail: player.guardian.email,
-      allocations: allocations.map((a) => ({
-        description: invoiceDescription(a.invoice.type, a.invoice.periodMonth, a.invoice.periodYear),
-        amountSen: a.amountSen,
-      })),
-      amountPaidSen: payment.amount,
-      pendingBalanceSen: pendingBalance,
-      billplzBillId: payment.billplzBillId,
-    });
-
-    await sendEmail({
-      to: player.guardian.email,
-      subject: `Receipt ${receiptNo} — payment received`,
-      react: FeeReceipt({
-        guardianName: player.guardian.name ?? "",
-        memberName: player.name,
-        amountPaidSen: payment.amount,
-        pendingBalanceSen: pendingBalance,
-        receiptNo,
-      }),
-      attachments: [{ filename: `${receiptNo}.pdf`, content: pdf }],
-    });
-
-    await prisma.payment.update({ where: { id: payment.id }, data: { receiptSentAt: new Date() } });
-  } catch (error) {
-    console.error(`settleFeePayment: receipt generation/email failed for payment ${payment.id}`, error);
-  }
+  await emailReceipt(paymentId);
 }

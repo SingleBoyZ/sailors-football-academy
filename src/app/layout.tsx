@@ -3,12 +3,6 @@ import type { ReactNode } from "react";
 import { Anton, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/content/site";
-import { SmoothScroll } from "@/components/motion/SmoothScroll";
-import { Preloader } from "@/components/motion/Preloader";
-import { RouteTransitionOverlay } from "@/components/motion/RouteTransitionOverlay";
-import { Nav } from "@/components/layout/Nav";
-import { Footer } from "@/components/layout/Footer";
-import { CartDrawer } from "@/components/cart/CartDrawer";
 import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider";
 
 const anton = Anton({
@@ -53,15 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${anton.variable} ${jakarta.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-brand-sand text-brand-ink">
-        <AuthSessionProvider>
-          <SmoothScroll />
-          <Preloader />
-          <RouteTransitionOverlay />
-          <Nav />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <CartDrawer />
-        </AuthSessionProvider>
+        <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
   );

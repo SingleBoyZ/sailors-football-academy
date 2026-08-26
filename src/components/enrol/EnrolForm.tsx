@@ -9,7 +9,7 @@ import { StepMedical } from "./StepMedical";
 import { StepReview } from "./StepReview";
 import { EMPTY_ENROL_FORM, type EnrolFormData } from "./types";
 import { playerDetailsSchema, guardianSchema, medicalConsentSchema, applicationSchema } from "@/lib/validations/enrol";
-import { submitApplication } from "@/app/enrol/actions";
+import { submitApplication } from "@/app/(site)/enrol/actions";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
