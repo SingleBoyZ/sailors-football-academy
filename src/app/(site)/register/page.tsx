@@ -71,14 +71,14 @@ export default function RegisterPage() {
             <span>Password</span>
             <input name="password" type="password" required minLength={8} className="border border-brand-ink/15 px-3 py-2.5" />
           </label>
-          {error && <p className="text-brand-red text-sm">{error}</p>}
+          {error && <p className="text-brand-red-dark text-sm">{error}</p>}
           <Button type="submit" size="lg" disabled={submitting} className="mt-2">
             {submitting ? "Creating account…" : "Create Account"}
           </Button>
         </form>
         <p className="text-brand-muted mt-8 text-center text-sm">
           Already have an account?{" "}
-          <TransitionLink href="/login" className="text-brand-red underline">
+          <TransitionLink href="/login" className="text-brand-red-dark underline">
             Sign in
           </TransitionLink>
         </p>

@@ -54,7 +54,7 @@ function SetPasswordForm() {
         <span>New Password</span>
         <input name="password" type="password" minLength={8} required className="border border-brand-ink/15 px-3 py-2.5" />
       </label>
-      {error && <p className="text-brand-red text-sm">{error}</p>}
+      {error && <p className="text-brand-red-dark text-sm">{error}</p>}
       <Button type="submit" size="lg" disabled={submitting} className="mt-2">
         {submitting ? "Setting password…" : "Set Password & Sign In"}
       </Button>

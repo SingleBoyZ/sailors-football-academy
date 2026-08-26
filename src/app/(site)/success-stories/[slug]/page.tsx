@@ -44,7 +44,7 @@ export default async function SuccessStoryPage({ params }: PageParams) {
           <div className="from-brand-ink via-brand-ink/40 absolute inset-0 bg-gradient-to-t to-transparent" />
         </div>
         <Container className="absolute inset-x-0 bottom-0 pb-10">
-          <span className="text-brand-red text-sm font-semibold tracking-wide uppercase">{story.ageGroup}</span>
+          <span className="text-brand-red-light text-sm font-semibold tracking-wide uppercase">{story.ageGroup}</span>
           <h1 className="font-display text-brand-white text-[clamp(2.5rem,7vw,5rem)] leading-[0.95]">
             {story.playerName}
           </h1>

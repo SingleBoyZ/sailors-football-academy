@@ -23,7 +23,7 @@ const columns: ColumnDef<Row, unknown>[] = [
     accessorKey: "orderNo",
     header: "Order No.",
     cell: ({ row }) => (
-      <TransitionLink href={`/admin/orders/${row.original.id}`} className="text-brand-red font-semibold underline">
+      <TransitionLink href={`/admin/orders/${row.original.id}`} className="text-brand-red-dark font-semibold underline">
         {row.original.orderNo}
       </TransitionLink>
     ),

@@ -83,7 +83,7 @@ export function ProductForm({ productId, initial }: ProductFormProps) {
         <input type="checkbox" name="active" defaultChecked={initial?.active ?? true} className="accent-brand-red h-4 w-4" />
         Active (visible in store)
       </label>
-      {error && <p className="text-brand-red text-sm">{error}</p>}
+      {error && <p className="text-brand-red-dark text-sm">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-fit">
         {submitting ? "Saving…" : productId ? "Save Changes" : "Create Product"}
       </Button>

@@ -22,7 +22,7 @@ export async function SuccessSpotlight() {
   return (
     <section className="bg-brand-sand py-20 sm:py-28">
       <Container>
-        <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">Success Story</p>
+        <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">Success Story</p>
         <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
           <Reveal className="relative lg:col-span-4">
             <div className="relative aspect-3/4 w-full max-w-sm">
@@ -41,7 +41,7 @@ export async function SuccessSpotlight() {
               </Button>
               <TransitionLink
                 href="/success-stories"
-                className="text-brand-ink hover:text-brand-red flex items-center text-sm font-semibold underline underline-offset-4"
+                className="text-brand-ink hover:text-brand-red-dark flex items-center text-sm font-semibold underline underline-offset-4"
               >
                 More Sailors&apos; stories
               </TransitionLink>

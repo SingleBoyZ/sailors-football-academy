@@ -9,7 +9,7 @@ export function PathwayTeaser() {
     <section className="bg-brand-sand py-20 sm:py-28">
       <Container>
         <Reveal>
-          <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">The Pathway</p>
+          <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">The Pathway</p>
           <h2 className="font-display max-w-2xl text-4xl leading-[0.95] sm:text-5xl">
             From Grassroots to the First Team
           </h2>

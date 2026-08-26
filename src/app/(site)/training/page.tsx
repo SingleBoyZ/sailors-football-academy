@@ -62,7 +62,7 @@ export default function TrainingPage() {
       <section className="bg-brand-sand py-20 sm:py-28">
         <Container>
           <Reveal>
-            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">Fees Structure</p>
+            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">Fees Structure</p>
             <h2 className="font-display max-w-2xl text-4xl leading-[0.95] sm:text-5xl">
               Simple, Transparent Pricing
             </h2>
@@ -111,7 +111,7 @@ export default function TrainingPage() {
         <Container className="grid gap-16 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Reveal>
-              <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">FAQ</p>
+              <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">FAQ</p>
               <h2 className="font-display mb-10 max-w-xl text-4xl leading-[0.95] sm:text-5xl">
                 Questions Parents Ask
               </h2>

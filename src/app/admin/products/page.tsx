@@ -28,7 +28,7 @@ const columns: ColumnDef<Row, unknown>[] = [
         <div className="bg-brand-sand relative h-10 w-10 shrink-0 overflow-hidden">
           {row.original.image && <Image src={row.original.image} alt="" fill className="object-cover" sizes="40px" />}
         </div>
-        <span className="text-brand-red font-semibold underline">{row.original.name}</span>
+        <span className="text-brand-red-dark font-semibold underline">{row.original.name}</span>
       </TransitionLink>
     ),
   },
@@ -38,7 +38,7 @@ const columns: ColumnDef<Row, unknown>[] = [
   {
     accessorKey: "active",
     header: "Status",
-    cell: ({ getValue }) => <span className={getValue() ? "text-brand-success" : "text-brand-muted"}>{getValue() ? "Active" : "Inactive"}</span>,
+    cell: ({ getValue }) => <span className={getValue() ? "text-brand-success-dark" : "text-brand-muted"}>{getValue() ? "Active" : "Inactive"}</span>,
   },
 ];
 

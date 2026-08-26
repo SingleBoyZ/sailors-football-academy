@@ -10,7 +10,7 @@ export function ProgrammeCards() {
     <section className="bg-brand-white py-20 sm:py-28">
       <Container>
         <Reveal>
-          <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">Programmes</p>
+          <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">Programmes</p>
           <h2 className="font-display max-w-2xl text-4xl leading-[0.95] sm:text-5xl">
             Three Levels. One Direction.
           </h2>
@@ -25,7 +25,7 @@ export function ProgrammeCards() {
                   ROTATIONS[i],
                 )}
               >
-                <span className="font-display text-brand-red text-sm">{programme.ageRange}</span>
+                <span className="font-display text-brand-red-dark text-sm">{programme.ageRange}</span>
                 <h3 className="font-display text-2xl">{programme.name}</h3>
                 <p className="text-brand-muted text-sm">{programme.summary}</p>
                 <ul className="mt-2 flex flex-col gap-2 text-sm">

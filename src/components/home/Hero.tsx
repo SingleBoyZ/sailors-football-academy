@@ -68,7 +68,7 @@ export function Hero() {
       />
 
       <div className="relative z-10 flex h-full flex-col justify-end px-5 pb-24 sm:px-8 lg:px-12 lg:pb-32">
-        <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">{SITE.hashtag}</p>
+        <p className="font-display text-brand-red-light mb-4 text-sm tracking-[0.3em]">{SITE.hashtag}</p>
         <SplitText
           as="h1"
           text="SET SAIL."

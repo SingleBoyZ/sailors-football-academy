@@ -113,7 +113,7 @@ export function VariantManager({ productId, variants }: { productId: string; var
           {adding ? "Adding…" : "Add Variant"}
         </button>
       </div>
-      {error && <p className="text-brand-red mt-2 text-xs">{error}</p>}
+      {error && <p className="text-brand-red-dark mt-2 text-xs">{error}</p>}
     </div>
   );
 }

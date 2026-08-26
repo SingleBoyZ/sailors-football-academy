@@ -57,7 +57,7 @@ export function ImageUploader({ productId, images }: { productId: string; images
           <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={uploading} />
         </label>
       </div>
-      {error && <p className="text-brand-red mt-2 text-xs">{error}</p>}
+      {error && <p className="text-brand-red-dark mt-2 text-xs">{error}</p>}
     </div>
   );
 }

@@ -48,7 +48,7 @@ export function ActiveToggle({ playerId, active }: { playerId: string; active: b
     <button
       onClick={handleToggle}
       disabled={saving}
-      className={`px-3 py-2 text-sm font-semibold ${active ? "bg-brand-success/10 text-brand-success" : "bg-brand-red/10 text-brand-red"}`}
+      className={`px-3 py-2 text-sm font-semibold ${active ? "bg-brand-success/10 text-brand-success-dark" : "bg-brand-red/10 text-brand-red-dark"}`}
     >
       {active ? "Active — click to deactivate" : "Inactive — click to reactivate"}
     </button>
@@ -97,7 +97,7 @@ export function ResendReceiptButton({ paymentId }: { paymentId: string }) {
   }
 
   return (
-    <button onClick={handleClick} disabled={sending} className="text-brand-red inline-flex items-center gap-1 text-xs underline">
+    <button onClick={handleClick} disabled={sending} className="text-brand-red-dark inline-flex items-center gap-1 text-xs underline">
       <Mail className="h-3 w-3" /> {sending ? "Sending…" : sent ? "Sent ✓" : "Email Receipt"}
     </button>
   );

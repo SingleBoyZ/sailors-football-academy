@@ -43,7 +43,7 @@ export default function AchievementsPage() {
                     >
                       <Trophy className="text-brand-red mt-1 h-6 w-6 shrink-0" />
                       <div>
-                        <span className="text-brand-red text-xs font-semibold tracking-wide uppercase">
+                        <span className="text-brand-red-dark text-xs font-semibold tracking-wide uppercase">
                           {trophy.tag}
                         </span>
                         <p className="font-display mt-1 text-lg leading-tight">{trophy.title}</p>
@@ -71,7 +71,7 @@ export default function AchievementsPage() {
             </div>
           </Reveal>
           <Reveal delay={0.15} className="lg:col-span-7">
-            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">The Pathway Works</p>
+            <p className="font-display text-brand-red-light mb-4 text-sm tracking-[0.3em]">The Pathway Works</p>
             <h2 className="font-display text-brand-white text-4xl leading-[0.95] sm:text-5xl">
               {YOUTH_FEATURE.headline}
             </h2>

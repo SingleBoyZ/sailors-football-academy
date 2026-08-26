@@ -126,7 +126,7 @@ export function EnrolForm() {
       </div>
 
       {submitError && (
-        <p className="bg-brand-warning/10 text-brand-warning border-brand-warning/30 mt-6 border p-3 text-sm">
+        <p className="bg-brand-warning/10 text-brand-warning-dark border-brand-warning/30 mt-6 border p-3 text-sm">
           {submitError}
         </p>
       )}

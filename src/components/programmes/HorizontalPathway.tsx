@@ -12,7 +12,7 @@ function PanelContent({ step }: { step: (typeof PATHWAY_STEPS)[number] }) {
         {String(step.step).padStart(2, "0")}
       </span>
       <div className="-mt-16 sm:-mt-24">
-        <span className="text-brand-red text-sm tracking-[0.3em] uppercase">{step.ageRange}</span>
+        <span className="text-brand-red-light text-sm tracking-[0.3em] uppercase">{step.ageRange}</span>
         <h3 className="font-display mt-2 text-4xl text-brand-white sm:text-6xl">{step.label}</h3>
         <p className="text-brand-white/70 mt-4 max-w-md text-base sm:text-lg">{step.description}</p>
       </div>

@@ -25,7 +25,7 @@ export function Timeline() {
         {CLUB_TIMELINE.map((entry) => (
           <Reveal key={entry.year} className="relative">
             <span className="bg-brand-red border-brand-sand absolute -left-10 top-1 h-4 w-4 -translate-x-1/2 rounded-full border-4 sm:-left-14" />
-            <span className="font-display text-brand-red text-sm tracking-[0.3em]">{entry.year}</span>
+            <span className="font-display text-brand-red-dark text-sm tracking-[0.3em]">{entry.year}</span>
             <h3 className="font-display mt-1 text-2xl sm:text-3xl">{entry.heading}</h3>
             <ul className="mt-4 flex flex-col gap-2">
               {entry.points.map((point) => (

@@ -26,11 +26,11 @@ export function StepMedical({ data, update, errors }: StepProps) {
         label={
           <>
             I have read and agree to the academy&apos;s{" "}
-            <a href="/terms" target="_blank" className="text-brand-red underline">
+            <a href="/terms" target="_blank" className="text-brand-red-dark underline">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="/privacy" target="_blank" className="text-brand-red underline">
+            <a href="/privacy" target="_blank" className="text-brand-red-dark underline">
               Privacy Policy
             </a>
             .

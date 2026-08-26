@@ -22,7 +22,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
         />
         <div className="from-brand-ink absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-5">
-          <span className="text-brand-red text-xs font-semibold tracking-wide uppercase">{story.ageGroup}</span>
+          <span className="text-brand-red-light text-xs font-semibold tracking-wide uppercase">{story.ageGroup}</span>
           <h3 className="font-display text-brand-white text-2xl leading-tight">{story.playerName}</h3>
         </div>
       </div>

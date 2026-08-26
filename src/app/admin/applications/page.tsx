@@ -31,7 +31,7 @@ const columns: ColumnDef<Row, unknown>[] = [
     accessorKey: "playerName",
     header: "Player",
     cell: ({ row }) => (
-      <TransitionLink href={`/admin/applications/${row.original.id}`} className="text-brand-red font-semibold underline">
+      <TransitionLink href={`/admin/applications/${row.original.id}`} className="text-brand-red-dark font-semibold underline">
         {row.original.playerName}
       </TransitionLink>
     ),

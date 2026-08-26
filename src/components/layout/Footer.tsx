@@ -24,7 +24,7 @@ export function Footer() {
             <span className="font-display text-lg">{SITE.name}</span>
           </div>
           <p className="text-brand-white/70 max-w-xs text-sm">{SITE.tagline}</p>
-          <p className="font-display text-brand-red text-sm">{SITE.hashtag}</p>
+          <p className="font-display text-brand-red-light text-sm">{SITE.hashtag}</p>
           <Button href={SITE.contact.whatsappHref} variant="outline" size="md" className="w-fit">
             <MessageCircle className="h-4 w-4" />
             WhatsApp Us
@@ -37,7 +37,7 @@ export function Footer() {
             <TransitionLink
               key={link.href}
               href={link.href}
-              className="text-brand-white/80 hover:text-brand-red text-sm transition-colors"
+              className="text-brand-white/80 hover:text-brand-red-light text-sm transition-colors"
             >
               {link.label}
             </TransitionLink>
@@ -50,7 +50,7 @@ export function Footer() {
             href={SITE.contact.instagramClub.url}
             target="_blank"
             rel="noreferrer"
-            className="text-brand-white/80 hover:text-brand-red flex items-center gap-2 text-sm transition-colors"
+            className="text-brand-white/80 hover:text-brand-red-light flex items-center gap-2 text-sm transition-colors"
           >
             <InstagramGlyph className="h-4 w-4" /> {SITE.contact.instagramClub.handle}
           </a>
@@ -58,7 +58,7 @@ export function Footer() {
             href={SITE.contact.instagramAcademy.url}
             target="_blank"
             rel="noreferrer"
-            className="text-brand-white/80 hover:text-brand-red flex items-center gap-2 text-sm transition-colors"
+            className="text-brand-white/80 hover:text-brand-red-light flex items-center gap-2 text-sm transition-colors"
           >
             <InstagramGlyph className="h-4 w-4" /> {SITE.contact.instagramAcademy.handle}
           </a>
@@ -66,7 +66,7 @@ export function Footer() {
             href={SITE.contact.whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="text-brand-white/80 hover:text-brand-red flex items-center gap-2 text-sm transition-colors"
+            className="text-brand-white/80 hover:text-brand-red-light flex items-center gap-2 text-sm transition-colors"
           >
             <MessageCircle className="h-4 w-4" /> {SITE.contact.whatsappDisplay}
           </a>
@@ -75,7 +75,7 @@ export function Footer() {
               <TransitionLink
                 key={link.href}
                 href={link.href}
-                className="text-brand-white/50 hover:text-brand-red text-xs transition-colors"
+                className="text-brand-white/50 hover:text-brand-red-light text-xs transition-colors"
               >
                 {link.label}
               </TransitionLink>

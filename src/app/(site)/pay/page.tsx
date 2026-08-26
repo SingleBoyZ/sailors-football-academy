@@ -91,7 +91,7 @@ export default function PayPage() {
                   className="border border-brand-ink/15 px-3 py-2.5"
                 />
               </label>
-              {lookupError && <p className="text-brand-red text-sm">{lookupError}</p>}
+              {lookupError && <p className="text-brand-red-dark text-sm">{lookupError}</p>}
               <Button type="submit" size="lg" disabled={looking}>
                 {looking ? "Searching…" : "Find Player"}
               </Button>
@@ -113,7 +113,7 @@ export default function PayPage() {
               </div>
 
               {player.outstandingSen <= 0 ? (
-                <p className="text-brand-success mt-6 text-center text-sm font-semibold">
+                <p className="text-brand-success-dark mt-6 text-center text-sm font-semibold">
                   This account is fully paid up — nothing due right now.
                 </p>
               ) : (
@@ -166,7 +166,7 @@ export default function PayPage() {
                     />
                   </label>
 
-                  {payError && <p className="text-brand-red text-sm">{payError}</p>}
+                  {payError && <p className="text-brand-red-dark text-sm">{payError}</p>}
 
                   <Button type="submit" size="lg" disabled={paying} className="mt-2">
                     {paying ? "Redirecting to Billplz…" : "Pay with Billplz"}

@@ -1,16 +1,16 @@
 import { cn } from "@/lib/utils";
 
 const TONES: Record<string, string> = {
-  PENDING: "bg-brand-warning/10 text-brand-warning",
-  APPROVED: "bg-brand-success/10 text-brand-success",
-  REJECTED: "bg-brand-red/10 text-brand-red",
-  PAID: "bg-brand-success/10 text-brand-success",
-  FAILED: "bg-brand-red/10 text-brand-red",
-  FULFILLED: "bg-brand-success/10 text-brand-success",
-  CANCELLED: "bg-brand-red/10 text-brand-red",
-  OPEN: "bg-brand-warning/10 text-brand-warning",
-  PARTIAL: "bg-brand-warning/10 text-brand-warning",
-  SETTLED: "bg-brand-success/10 text-brand-success",
+  PENDING: "bg-brand-warning/10 text-brand-warning-dark",
+  APPROVED: "bg-brand-success/10 text-brand-success-dark",
+  REJECTED: "bg-brand-red/10 text-brand-red-dark",
+  PAID: "bg-brand-success/10 text-brand-success-dark",
+  FAILED: "bg-brand-red/10 text-brand-red-dark",
+  FULFILLED: "bg-brand-success/10 text-brand-success-dark",
+  CANCELLED: "bg-brand-red/10 text-brand-red-dark",
+  OPEN: "bg-brand-warning/10 text-brand-warning-dark",
+  PARTIAL: "bg-brand-warning/10 text-brand-warning-dark",
+  SETTLED: "bg-brand-success/10 text-brand-success-dark",
 };
 
 export function StatusBadge({ status }: { status: string }) {

@@ -25,7 +25,7 @@ export async function FeaturedProducts() {
       <Container>
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <Reveal>
-            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">The Store</p>
+            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">The Store</p>
             <h2 className="font-display max-w-xl text-4xl leading-[0.95] sm:text-5xl">
               Kit Up Like a Sailor
             </h2>

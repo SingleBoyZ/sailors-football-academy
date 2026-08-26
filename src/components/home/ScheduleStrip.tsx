@@ -10,7 +10,7 @@ export function ScheduleStrip() {
       <Container>
         <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
           <Reveal className="lg:col-span-5">
-            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">Training</p>
+            <p className="font-display text-brand-red-light mb-4 text-sm tracking-[0.3em]">Training</p>
             <h2 className="font-display text-brand-white text-4xl leading-[0.95] sm:text-5xl">
               Rain or Shine, at Rimbayu
             </h2>

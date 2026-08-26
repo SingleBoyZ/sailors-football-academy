@@ -49,7 +49,7 @@ function LoginForm() {
           <span>Password</span>
           <input name="password" type="password" required className="border border-brand-ink/15 px-3 py-2.5" />
         </label>
-        {error && <p className="text-brand-red text-sm">{error}</p>}
+        {error && <p className="text-brand-red-dark text-sm">{error}</p>}
         <Button type="submit" size="lg" disabled={submitting} className="mt-2">
           {submitting ? "Signing in…" : "Sign In"}
         </Button>
@@ -72,7 +72,7 @@ function LoginForm() {
 
       <p className="text-brand-muted mt-8 text-center text-sm">
         New here?{" "}
-        <TransitionLink href="/register" className="text-brand-red underline">
+        <TransitionLink href="/register" className="text-brand-red-dark underline">
           Create a parent account
         </TransitionLink>
       </p>

@@ -14,7 +14,7 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
   return (
     <section className="bg-brand-ink pt-16 pb-14 sm:pt-24 sm:pb-20">
       <Container>
-        <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">{eyebrow}</p>
+        <p className="font-display text-brand-red-light mb-4 text-sm tracking-[0.3em]">{eyebrow}</p>
         <SplitText
           as="h1"
           text={title}

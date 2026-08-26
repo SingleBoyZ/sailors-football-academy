@@ -20,7 +20,7 @@ export function StepPlayer({ data, update, errors }: StepProps) {
         <div>
           <TextField label="Date of Birth" type="date" value={data.dob} onChange={(v) => update({ dob: v })} error={errors.dob} />
           {ageGroup && (
-            <p className="text-brand-red mt-1.5 text-xs">
+            <p className="text-brand-red-dark mt-1.5 text-xs">
               This places your child in age group <strong>{ageGroup}</strong>.
             </p>
           )}

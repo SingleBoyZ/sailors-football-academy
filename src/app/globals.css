@@ -7,12 +7,15 @@
 :root {
   --color-brand-red: #e8232a;
   --color-brand-red-dark: #c01820;
+  --color-brand-red-light: #ff5c5c;
   --color-brand-ink: #0f0f10;
   --color-brand-white: #ffffff;
   --color-brand-sand: #f7f5f2;
   --color-brand-muted: #5b5b60;
   --color-brand-success: #1f9d55;
+  --color-brand-success-dark: #157a42;
   --color-brand-warning: #d97706;
+  --color-brand-warning-dark: #a35400;
 
   --background: var(--color-brand-sand);
   --foreground: var(--color-brand-ink);
@@ -24,12 +27,15 @@
 
   --color-brand-red: var(--color-brand-red);
   --color-brand-red-dark: var(--color-brand-red-dark);
+  --color-brand-red-light: var(--color-brand-red-light);
   --color-brand-ink: var(--color-brand-ink);
   --color-brand-white: var(--color-brand-white);
   --color-brand-sand: var(--color-brand-sand);
   --color-brand-muted: var(--color-brand-muted);
   --color-brand-success: var(--color-brand-success);
+  --color-brand-success-dark: var(--color-brand-success-dark);
   --color-brand-warning: var(--color-brand-warning);
+  --color-brand-warning-dark: var(--color-brand-warning-dark);
 
   --font-display: var(--font-anton), "Arial Narrow", sans-serif;
   --font-sans: var(--font-jakarta), "Segoe UI", sans-serif;

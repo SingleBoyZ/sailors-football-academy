@@ -107,10 +107,10 @@ export default async function PortalPage() {
                                 <span
                                   className={
                                     payment.status === "PAID"
-                                      ? "text-brand-success"
+                                      ? "text-brand-success-dark"
                                       : payment.status === "FAILED"
                                         ? "text-brand-red"
-                                        : "text-brand-warning"
+                                        : "text-brand-warning-dark"
                                   }
                                 >
                                   {payment.status}

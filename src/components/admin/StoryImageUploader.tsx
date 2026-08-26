@@ -39,7 +39,7 @@ export function StoryImageUploader({ storyId, image }: { storyId: string; image:
         {uploading ? "Uploading…" : "Replace photo"}
         <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} disabled={uploading} />
       </label>
-      {error && <p className="text-brand-red text-xs">{error}</p>}
+      {error && <p className="text-brand-red-dark text-xs">{error}</p>}
     </div>
   );
 }

@@ -73,7 +73,7 @@ export function SuccessStoryForm({ storyId, initial }: Props) {
         <input type="checkbox" name="published" defaultChecked={initial?.published ?? false} className="accent-brand-red h-4 w-4" />
         Published (visible on the site)
       </label>
-      {error && <p className="text-brand-red text-sm">{error}</p>}
+      {error && <p className="text-brand-red-dark text-sm">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-fit">
         {submitting ? "Saving…" : storyId ? "Save Changes" : "Create Story"}
       </Button>

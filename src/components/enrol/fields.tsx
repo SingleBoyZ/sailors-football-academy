@@ -12,7 +12,7 @@ function FieldWrapper({ label, error, className, children }: FieldWrapperProps) 
     <label className={`flex flex-col gap-1.5 text-sm ${className ?? ""}`}>
       <span>{label}</span>
       {children}
-      {error && <span className="text-brand-red text-xs">{error}</span>}
+      {error && <span className="text-brand-red-dark text-xs">{error}</span>}
     </label>
   );
 }
@@ -103,7 +103,7 @@ export function CheckboxField({ label, checked, onChange, error }: CheckboxField
         />
         <span>{label}</span>
       </label>
-      {error && <span className="text-brand-red mt-1 block text-xs">{error}</span>}
+      {error && <span className="text-brand-red-dark mt-1 block text-xs">{error}</span>}
     </div>
   );
 }

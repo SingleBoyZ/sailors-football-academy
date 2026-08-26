@@ -68,7 +68,7 @@ export function SettingsForm({ initial }: Props) {
         <span>Home Page Banner Text</span>
         <input name="banner" defaultValue={initial.bannerText} maxLength={200} className="border border-brand-ink/15 px-3 py-2.5" />
       </label>
-      {error && <p className="text-brand-red text-sm">{error}</p>}
+      {error && <p className="text-brand-red-dark text-sm">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-fit">
         {submitting ? "Saving…" : saved ? "Saved ✓" : "Save Settings"}
       </Button>

@@ -83,7 +83,7 @@ export function ApplicationReviewActions({ applicationId, suggestedAgeGroup }: P
             </select>
           </label>
         </div>
-        {error && <p className="text-brand-red text-sm">{error}</p>}
+        {error && <p className="text-brand-red-dark text-sm">{error}</p>}
         <div className="flex gap-3">
           <Button onClick={handleApprove} disabled={submitting}>
             {submitting ? "Approving…" : "Confirm Approval"}
@@ -102,7 +102,7 @@ export function ApplicationReviewActions({ applicationId, suggestedAgeGroup }: P
           <span>Reason (optional, included in the email to the guardian)</span>
           <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} className="border border-brand-ink/15 px-3 py-2" />
         </label>
-        {error && <p className="text-brand-red text-sm">{error}</p>}
+        {error && <p className="text-brand-red-dark text-sm">{error}</p>}
         <div className="flex gap-3">
           <Button onClick={handleReject} disabled={submitting} variant="secondary">
             {submitting ? "Rejecting…" : "Confirm Rejection"}

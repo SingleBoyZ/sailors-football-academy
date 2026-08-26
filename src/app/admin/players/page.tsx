@@ -23,7 +23,7 @@ const columns: ColumnDef<Row, unknown>[] = [
     accessorKey: "memberCode",
     header: "Member Code",
     cell: ({ row }) => (
-      <TransitionLink href={`/admin/players/${row.original.id}`} className="text-brand-red font-semibold underline">
+      <TransitionLink href={`/admin/players/${row.original.id}`} className="text-brand-red-dark font-semibold underline">
         {row.original.memberCode}
       </TransitionLink>
     ),
@@ -37,14 +37,14 @@ const columns: ColumnDef<Row, unknown>[] = [
     header: "Outstanding",
     cell: ({ getValue }) => {
       const value = getValue() as number;
-      return <span className={value > 0 ? "text-brand-red font-semibold" : "text-brand-success"}>{formatSenCompact(value)}</span>;
+      return <span className={value > 0 ? "text-brand-red-dark font-semibold" : "text-brand-success"}>{formatSenCompact(value)}</span>;
     },
   },
   {
     accessorKey: "active",
     header: "Status",
     cell: ({ getValue }) => (
-      <span className={getValue() ? "text-brand-success" : "text-brand-muted"}>{getValue() ? "Active" : "Inactive"}</span>
+      <span className={getValue() ? "text-brand-success-dark" : "text-brand-muted"}>{getValue() ? "Active" : "Inactive"}</span>
     ),
   },
 ];

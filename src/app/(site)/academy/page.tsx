@@ -27,7 +27,7 @@ export default function AcademyPage() {
         <Container className="grid gap-16 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <Reveal>
-              <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">The Journey</p>
+              <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">The Journey</p>
               <div className="flex flex-col gap-5">
                 {ABOUT_COPY.paragraphs.map((p) => (
                   <p key={p.slice(0, 20)} className="text-brand-muted text-base leading-relaxed">
@@ -46,7 +46,7 @@ export default function AcademyPage() {
       <section className="bg-brand-sand py-20 sm:py-28">
         <Container className="grid gap-12 lg:grid-cols-12 lg:items-center">
           <Reveal className="lg:col-span-6">
-            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">Philosophy</p>
+            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">Philosophy</p>
             <h2 className="font-display text-4xl leading-[0.95] sm:text-5xl">{PHILOSOPHY.heading}</h2>
             <p className="text-brand-muted mt-6 text-base leading-relaxed">{PHILOSOPHY.body}</p>
           </Reveal>
@@ -78,7 +78,7 @@ export default function AcademyPage() {
             </div>
           </Reveal>
           <Reveal delay={0.15} className="order-1 lg:order-2 lg:col-span-6">
-            <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red">Home Ground</p>
+            <p className="font-display text-brand-red-light mb-4 text-sm tracking-[0.3em]">Home Ground</p>
             <h2 className="font-display text-brand-white text-4xl leading-[0.95] sm:text-5xl">
               {HOME_GROUND.name}
             </h2>

@@ -26,7 +26,7 @@ export function StepReview({ data, onEdit }: StepReviewProps) {
       <section className="border border-brand-ink/10 p-5">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="font-display text-lg">Player</h3>
-          <button type="button" onClick={() => onEdit(0)} className="text-brand-red text-xs underline">
+          <button type="button" onClick={() => onEdit(0)} className="text-brand-red-dark text-xs underline">
             Edit
           </button>
         </div>
@@ -41,7 +41,7 @@ export function StepReview({ data, onEdit }: StepReviewProps) {
       <section className="border border-brand-ink/10 p-5">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="font-display text-lg">Guardian</h3>
-          <button type="button" onClick={() => onEdit(1)} className="text-brand-red text-xs underline">
+          <button type="button" onClick={() => onEdit(1)} className="text-brand-red-dark text-xs underline">
             Edit
           </button>
         </div>
@@ -55,7 +55,7 @@ export function StepReview({ data, onEdit }: StepReviewProps) {
       <section className="border border-brand-ink/10 p-5">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="font-display text-lg">Medical &amp; Consent</h3>
-          <button type="button" onClick={() => onEdit(2)} className="text-brand-red text-xs underline">
+          <button type="button" onClick={() => onEdit(2)} className="text-brand-red-dark text-xs underline">
             Edit
           </button>
         </div>

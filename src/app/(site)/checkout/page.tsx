@@ -136,7 +136,7 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            {error && <p className="bg-brand-warning/10 text-brand-warning border border-brand-warning/30 p-3 text-sm">{error}</p>}
+            {error && <p className="bg-brand-warning/10 text-brand-warning-dark border border-brand-warning/30 p-3 text-sm">{error}</p>}
 
             <Button type="submit" size="lg" disabled={submitting} className="mt-2">
               {submitting ? "Redirecting to Billplz…" : `Pay ${formatSenCompact(total)} with Billplz`}

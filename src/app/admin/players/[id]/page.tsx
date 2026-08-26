@@ -120,7 +120,7 @@ export default async function PlayerDetailPage({ params }: PageProps) {
                   <td className="py-2">
                     {payment.status === "PAID" && payment.receiptNo ? (
                       <div className="flex items-center gap-3">
-                        <a href={`/api/receipts/${payment.id}`} className="text-brand-red underline">
+                        <a href={`/api/receipts/${payment.id}`} className="text-brand-red-dark underline">
                           {payment.receiptNo}
                         </a>
                         <ResendReceiptButton paymentId={payment.id} />

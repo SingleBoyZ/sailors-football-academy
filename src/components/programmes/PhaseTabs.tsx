@@ -48,7 +48,7 @@ export function PhaseTabs() {
           transition={{ duration: 0.35 }}
           className="pt-10"
         >
-          <span className="text-brand-red text-sm tracking-[0.3em] uppercase">{phase.timing}</span>
+          <span className="text-brand-red-dark text-sm tracking-[0.3em] uppercase">{phase.timing}</span>
           <p className="text-brand-muted mt-3 max-w-2xl text-base">{phase.intro}</p>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
