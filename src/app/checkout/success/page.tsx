@@ -1,0 +1,75 @@
+import { redirect } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { getBill, verifyRedirectSignature, getRedirectParam } from "@/lib/billplz";
+import { formatSenCompact } from "@/lib/money";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Container } from "@/components/ui/Container";
+import { Button } from "@/components/ui/Button";
+import { ClearCartOnMount } from "@/components/cart/ClearCartOnMount";
+
+export const dynamic = "force-dynamic";
+
+type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
+  const resolved = await searchParams;
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(resolved)) {
+    if (typeof value === "string") params.set(key, value);
+  }
+
+  const billId = getRedirectParam(params, "id");
+  if (!billId || !verifyRedirectSignature(params)) {
+    redirect("/checkout/failed");
+  }
+
+  // The redirect alone is never proof of payment — re-confirm with Billplz directly.
+  const bill = await getBill(billId).catch(() => null);
+  if (!bill || !bill.paid) {
+    redirect("/checkout/failed");
+  }
+
+  const order = await prisma.order.findFirst({
+    where: { billplzBillId: billId },
+    include: { items: true },
+  });
+
+  if (!order) redirect("/checkout/failed");
+
+  return (
+    <>
+      <ClearCartOnMount />
+      <PageHeader eyebrow="Checkout" title="Payment Received" />
+      <Container className="py-16 sm:py-24">
+        <div className="mx-auto max-w-lg text-center">
+          <CheckCircle2 className="text-brand-success mx-auto mb-6 h-14 w-14" />
+          <h2 className="font-display text-3xl">Thank you, {order.customerName}</h2>
+          <p className="text-brand-muted mt-3">
+            Order <strong className="text-brand-ink">{order.orderNo}</strong> is confirmed. A receipt has
+            been sent to {order.email}.
+          </p>
+
+          <div className="mt-8 border border-brand-ink/10 p-6 text-left">
+            {order.items.map((item) => (
+              <div key={item.id} className="flex justify-between py-1 text-sm">
+                <span>
+                  {item.productName} — {item.variantLabel} &times; {item.qty}
+                </span>
+                <span>{formatSenCompact(item.unitPriceSen * item.qty)}</span>
+              </div>
+            ))}
+            <div className="font-display mt-3 flex justify-between border-t border-brand-ink/10 pt-3 text-lg">
+              <span>Total</span>
+              <span>{formatSenCompact(order.totalSen)}</span>
+            </div>
+          </div>
+
+          <Button href="/store" variant="secondary" className="mt-8">
+            Continue Shopping
+          </Button>
+        </div>
+      </Container>
+    </>
+  );
+}
