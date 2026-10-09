@@ -1,27 +1,26 @@
-import NextAuth from "next-auth";
-import { NextResponse } from "next/server";
-import { authConfig } from "@/auth.config";
+import { type NextRequest, NextResponse } from "next/server";
+import { updateSupabaseSession } from "@/lib/supabase/middleware";
 
-// A separate, Edge-safe NextAuth instance (no Prisma adapter, no bcrypt
-// Credentials provider) — see auth.config.ts for why. Only JWT verification
-// happens here, which is all middleware needs to gate routes by role.
-const { auth } = NextAuth(authConfig);
+/**
+ * Refreshes the Supabase session cookie and gates the protected areas.
+ * Authenticated but non-admin users reaching /admin are bounced to their
+ * portal (the admin layout re-checks the role server-side too).
+ */
+export async function middleware(request: NextRequest) {
+  const { response, user } = await updateSupabaseSession(request);
+  const { pathname } = request.nextUrl;
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
-  const isLoggedIn = !!req.auth;
-  const isAdmin = req.auth?.user?.role === "ADMIN";
-
-  if (pathname.startsWith("/admin") && !isAdmin) {
-    return NextResponse.redirect(new URL(isLoggedIn ? "/portal" : "/login", req.url));
-  }
-
-  if (pathname.startsWith("/portal") && !isLoggedIn) {
-    const loginUrl = new URL("/login", req.url);
+  // Gate /admin and /portal behind a signed-in session. The admin role check
+  // itself needs a DB read, which Edge middleware can't do — it's enforced
+  // in src/app/admin/layout.tsx (plus requireAdmin on every admin action).
+  if ((pathname.startsWith("/admin") || pathname.startsWith("/portal")) && !user) {
+    const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
-});
+
+  return response;
+}
 
 export const config = {
   matcher: ["/admin/:path*", "/portal/:path*"],

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { getBill, verifyRedirectSignature, getRedirectParam } from "@/lib/billplz";
+import { db } from "@/lib/data";
+import { isDevGatewayEnabled } from "@/lib/payments/dev-gateway";
 import { formatSenCompact } from "@/lib/money";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container } from "@/components/ui/Container";
@@ -14,28 +14,33 @@ type PageProps = { searchParams: Promise<Record<string, string | string[] | unde
 
 export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
   const resolved = await searchParams;
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(resolved)) {
-    if (typeof value === "string") params.set(key, value);
+
+  let billId: string | null = null;
+
+  if (isDevGatewayEnabled()) {
+    // The dev-only mock gateway already confirmed the order + decremented
+    // stock before redirecting here — no real Billplz webhook to re-verify.
+    billId = typeof resolved.billId === "string" ? resolved.billId : null;
+    if (!billId) redirect("/checkout/failed");
+  } else {
+    const { getBill, verifyRedirectSignature, getRedirectParam } = await import("@/lib/billplz");
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(resolved)) {
+      if (typeof value === "string") params.set(key, value);
+    }
+    billId = getRedirectParam(params, "id");
+    if (!billId || !verifyRedirectSignature(params)) {
+      redirect("/checkout/failed");
+    }
+    // The redirect alone is never proof of payment — re-confirm with Billplz directly.
+    const bill = await getBill(billId).catch(() => null);
+    if (!bill || !bill.paid) {
+      redirect("/checkout/failed");
+    }
   }
 
-  const billId = getRedirectParam(params, "id");
-  if (!billId || !verifyRedirectSignature(params)) {
-    redirect("/checkout/failed");
-  }
-
-  // The redirect alone is never proof of payment — re-confirm with Billplz directly.
-  const bill = await getBill(billId).catch(() => null);
-  if (!bill || !bill.paid) {
-    redirect("/checkout/failed");
-  }
-
-  const order = await prisma.order.findFirst({
-    where: { billplzBillId: billId },
-    include: { items: true },
-  });
-
-  if (!order) redirect("/checkout/failed");
+  const order = await db.getOrderByBillId(billId);
+  if (!order || (isDevGatewayEnabled() && order.status === "PENDING")) redirect("/checkout/failed");
 
   return (
     <>

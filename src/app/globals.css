@@ -40,7 +40,7 @@
   --font-display: var(--font-anton), "Arial Narrow", sans-serif;
   --font-sans: var(--font-jakarta), "Segoe UI", sans-serif;
 
-  --animate-marquee: marquee 22s linear infinite;
+  --animate-marquee: marquee 34s linear infinite;
   --animate-bob: bob 2.4s ease-in-out infinite;
   --animate-draw: draw 1.4s ease forwards;
 

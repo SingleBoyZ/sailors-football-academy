@@ -1,6 +1,6 @@
 import { CheckCircle2, XCircle } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { getBill, verifyRedirectSignature, getRedirectParam } from "@/lib/billplz";
+import { db } from "@/lib/data";
+import { isDevGatewayEnabled } from "@/lib/payments/dev-gateway";
 import { formatSenCompact } from "@/lib/money";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container } from "@/components/ui/Container";
@@ -12,24 +12,33 @@ type PageProps = { searchParams: Promise<Record<string, string | string[] | unde
 
 export default async function PayResultPage({ searchParams }: PageProps) {
   const resolved = await searchParams;
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(resolved)) {
-    if (typeof value === "string") params.set(key, value);
+
+  let billId: string | null = null;
+  let paid = false;
+  let verified = false;
+
+  if (isDevGatewayEnabled()) {
+    // The dev-only mock gateway already confirmed the payment before
+    // redirecting here — no real Billplz webhook exists to re-verify against.
+    billId = typeof resolved.id === "string" ? resolved.id : null;
+    paid = resolved.status === "paid";
+    verified = Boolean(billId);
+  } else {
+    const { getBill, verifyRedirectSignature, getRedirectParam } = await import("@/lib/billplz");
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(resolved)) {
+      if (typeof value === "string") params.set(key, value);
+    }
+    billId = getRedirectParam(params, "id");
+    const signatureValid = billId ? verifyRedirectSignature(params) : false;
+    const bill = signatureValid && billId ? await getBill(billId).catch(() => null) : null;
+    paid = Boolean(bill?.paid);
+    verified = signatureValid && Boolean(bill);
   }
 
-  const billId = getRedirectParam(params, "id");
-  const signatureValid = billId ? verifyRedirectSignature(params) : false;
+  const payment = billId ? await db.getPaymentByBillId(billId).catch(() => null) : null;
 
-  const bill = signatureValid && billId ? await getBill(billId).catch(() => null) : null;
-  const paid = Boolean(bill?.paid);
-
-  const payment = billId
-    ? await prisma.payment
-        .findUnique({ where: { billplzBillId: billId }, include: { player: true } })
-        .catch(() => null)
-    : null;
-
-  if (!signatureValid || !bill || !payment) {
+  if (!verified || !payment) {
     return (
       <>
         <PageHeader eyebrow="Fees" title="Payment Not Confirmed" />

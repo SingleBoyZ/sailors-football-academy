@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { SuccessStoryForm } from "@/components/admin/SuccessStoryForm";
 import { StoryImageUploader } from "@/components/admin/StoryImageUploader";
 
@@ -9,7 +9,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function SuccessStoryDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const story = await prisma.successStory.findUnique({ where: { id } });
+  const story = await db.getSuccessStoryById(id);
   if (!story) notFound();
 
   return (

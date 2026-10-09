@@ -1,53 +1,47 @@
 import Image from "next/image";
-import { Quote } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { Reveal } from "@/components/motion/Reveal";
-import { TransitionLink } from "@/components/motion/TransitionLink";
-import { Button } from "@/components/ui/Button";
+import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Container } from "@/components/ui/Container";
 
 export async function SuccessSpotlight() {
-  const story = await prisma.successStory
-    .findFirst({
-      where: { published: true },
-      orderBy: { createdAt: "desc" },
-    })
-    .catch((error: unknown) => {
-      console.error("SuccessSpotlight: failed to load story", error);
-      return null;
-    });
+  const stories = await db.getSuccessStories({ published: true }).catch((error: unknown) => {
+    console.error("SuccessSpotlight: failed to load stories", error);
+    return [];
+  });
 
-  if (!story) return null;
+  const featured = stories.slice(0, 3);
+  if (featured.length === 0) return null;
 
   return (
     <section className="bg-brand-sand py-20 sm:py-28">
       <Container>
-        <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">Success Story</p>
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-          <Reveal className="relative lg:col-span-4">
-            <div className="relative aspect-3/4 w-full max-w-sm">
-              <Image src={story.image} alt={story.playerName} fill className="object-cover" sizes="(min-width: 1024px) 30vw, 90vw" />
-            </div>
-          </Reveal>
-          <Reveal delay={0.15} className="lg:col-span-8">
-            <Quote className="text-brand-red h-10 w-10" />
-            <p className="font-display mt-4 text-2xl leading-snug sm:text-3xl">&ldquo;{story.quote}&rdquo;</p>
-            <p className="text-brand-muted mt-6 text-sm">
-              <span className="text-brand-ink font-semibold">{story.playerName}</span> &middot; {story.ageGroup}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button href={`/success-stories/${story.slug}`} variant="secondary">
-                Read Their Story
-              </Button>
-              <TransitionLink
-                href="/success-stories"
-                className="text-brand-ink hover:text-brand-red-dark flex items-center text-sm font-semibold underline underline-offset-4"
-              >
-                More Sailors&apos; stories
-              </TransitionLink>
-            </div>
-          </Reveal>
-        </div>
+        <Reveal>
+          <p className="font-display mb-4 text-sm tracking-[0.3em] text-brand-red-dark">Success Stories</p>
+          <h2 className="font-display max-w-xl text-4xl leading-[0.95] sm:text-5xl">Real Sailors, Real Progress</h2>
+        </Reveal>
+
+        <Stagger as="div" className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((story) => (
+            <StaggerItem key={story.slug}>
+              <div className="relative aspect-3/4 overflow-hidden bg-brand-white">
+                <Image
+                  src={story.image}
+                  alt={story.playerName}
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 30vw, 90vw"
+                />
+                <div className="from-brand-ink absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <span className="text-brand-red-light text-xs font-semibold tracking-wide uppercase">{story.ageGroup}</span>
+                  <h3 className="font-display text-brand-white text-2xl leading-tight">{story.playerName}</h3>
+                </div>
+              </div>
+              <p className="text-brand-muted mt-4 text-sm leading-relaxed italic">&ldquo;{story.quote}&rdquo;</p>
+            </StaggerItem>
+          ))}
+        </Stagger>
       </Container>
     </section>
   );

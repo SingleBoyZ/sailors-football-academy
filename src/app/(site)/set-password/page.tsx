@@ -2,10 +2,11 @@
 
 import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { createSupabaseBrowser } from "@/lib/supabase/client";
+import { mergeGuestCartIntoServer } from "@/lib/cart-merge";
 import { setPassword } from "./actions";
 
 function SetPasswordForm() {
@@ -37,12 +38,14 @@ function SetPasswordForm() {
       return;
     }
 
-    const signInResult = await signIn("credentials", { email, password, redirect: false });
+    const supabase = createSupabaseBrowser();
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
-    if (signInResult?.error) {
+    if (signInError) {
       router.push("/login");
       return;
     }
+    await mergeGuestCartIntoServer();
     router.push("/portal");
     router.refresh();
   }

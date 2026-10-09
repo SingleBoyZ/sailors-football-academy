@@ -1,28 +1,48 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 
 const prisma = new PrismaClient();
 
+/**
+ * Creates (or promotes) the admin account in Supabase Auth and marks the
+ * mirrored profiles row as ADMIN. Requires NEXT_PUBLIC_SUPABASE_URL and
+ * SUPABASE_SERVICE_ROLE_KEY; without them the rest of the seed still runs.
+ */
 async function seedAdmin() {
   const email = process.env.ADMIN_SEED_EMAIL || "admin@sailorsfootballacademy.com";
   const password = process.env.ADMIN_SEED_PASSWORD || "ChangeMe123!";
 
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  await prisma.user.upsert({
-    where: { email },
-    update: { role: "ADMIN", passwordHash },
-    create: {
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
-      name: "Academy Admin",
-      role: "ADMIN",
-      passwordHash,
-    },
-  });
+      password,
+      email_confirm: true,
+      user_metadata: { name: "Academy Admin" },
+    });
 
-  if (!process.env.ADMIN_SEED_EMAIL || !process.env.ADMIN_SEED_PASSWORD) {
+    if (error && !/already been registered/i.test(error.message)) {
+      throw new Error(error.message);
+    }
+
+    const authId = data.user?.id;
+    if (authId) {
+      await prisma.user.upsert({
+        where: { id: authId },
+        update: { role: "ADMIN" },
+        create: { id: authId, email, name: "Academy Admin", role: "ADMIN" },
+      });
+    }
+
+    if (!process.env.ADMIN_SEED_EMAIL || !process.env.ADMIN_SEED_PASSWORD) {
+      console.warn(
+        `\n⚠️  ADMIN_SEED_EMAIL/ADMIN_SEED_PASSWORD not set — using default admin ${email} / ${password}. Change this before going live.\n`,
+      );
+    }
+  } catch (error) {
     console.warn(
-      `\n⚠️  ADMIN_SEED_EMAIL/ADMIN_SEED_PASSWORD not set — using default admin ${email} / ${password}. Change this before going live.\n`,
+      `\n⚠️  Could not create the admin auth account (${error instanceof Error ? error.message : error}). ` +
+        "Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, then re-run `npm run db:seed` (or use scripts/create-admin.ts).\n",
     );
   }
 }

@@ -1,31 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/data";
 import { renderReceiptPdf } from "@/lib/pdf/receipt";
-import { getOutstandingForPlayer } from "@/lib/fees";
-
-const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-function invoiceDescription(type: string, periodMonth: number, periodYear: number): string {
-  if (type === "REGISTRATION") return "Registration Fee";
-  return `Monthly Fee — ${MONTH_NAMES[periodMonth - 1]} ${periodYear}`;
-}
+import { invoiceDescription } from "@/lib/payments/allocate";
 
 type RouteParams = { params: Promise<{ paymentId: string }> };
 
-/** Regenerates a fee payment's PDF receipt on demand from DB data — the PDF is never stored. */
+/** Regenerates a fee payment's PDF receipt on demand from data-layer data — the PDF is never stored. */
 export async function GET(_request: Request, { params }: RouteParams) {
   const session = await auth();
   if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
   const { paymentId } = await params;
-  const payment = await prisma.payment.findUnique({
-    where: { id: paymentId },
-    include: { player: { include: { guardian: true } }, allocations: { include: { invoice: true } } },
-  });
+  const payment = await db.getPaymentById(paymentId);
 
   if (!payment || !payment.player || payment.status !== "PAID" || !payment.receiptNo) {
     return new NextResponse("Receipt not found", { status: 404 });
@@ -37,7 +24,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  const pendingBalance = await getOutstandingForPlayer(payment.player.id);
+  const pendingBalance = await db.getOutstandingForPlayer(payment.player.id);
 
   const pdf = await renderReceiptPdf({
     receiptNo: payment.receiptNo,

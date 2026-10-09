@@ -1,9 +1,15 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { Sidebar } from "@/components/admin/Sidebar";
 
 export const metadata = { title: { template: "%s — Admin", default: "Admin" } };
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
+  if (!session) redirect("/login?callbackUrl=/admin");
+  if (session.user.role !== "ADMIN") redirect("/portal?notice=admin-denied");
+
   return (
     <div className="bg-brand-sand flex min-h-screen">
       <Sidebar />

@@ -2,22 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { ProductDetail } from "@/components/store/ProductDetail";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 type PageParams = { params: Promise<{ slug: string }> };
 
 async function getProduct(slug: string) {
-  return prisma.product
-    .findUnique({
-      where: { slug },
-      include: { variants: { orderBy: { label: "asc" } } },
-    })
-    .catch((error: unknown) => {
-      console.error("ProductPage: failed to load product", error);
-      return null;
-    });
+  return db.getProduct(slug).catch((error: unknown) => {
+    console.error("ProductPage: failed to load product", error);
+    return null;
+  });
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {

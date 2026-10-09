@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { getOutstandingForPlayer } from "@/lib/fees";
+import { db } from "@/lib/data";
 import { formatSenCompact } from "@/lib/money";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { PlanSwitcher, ActiveToggle, NotesEditor, ResendReceiptButton } from "@/components/admin/PlayerControls";
@@ -12,17 +11,10 @@ type PageProps = { params: Promise<{ id: string }> };
 export default async function PlayerDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  const player = await prisma.player.findUnique({
-    where: { id },
-    include: {
-      guardian: true,
-      payments: { orderBy: { createdAt: "desc" } },
-      invoices: { orderBy: [{ periodYear: "desc" }, { periodMonth: "desc" }] },
-    },
-  });
+  const player = await db.getPlayerById(id);
   if (!player) notFound();
 
-  const outstanding = await getOutstandingForPlayer(player.id);
+  const outstanding = await db.getOutstandingForPlayer(player.id);
 
   return (
     <div className="flex flex-col gap-8">

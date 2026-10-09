@@ -3,37 +3,32 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
-import { SESSION_PRELOADER_KEY, EASE_REVEAL, EASE_IN_OUT } from "@/lib/motion";
+import { DURATION, EASE_REVEAL, EASE_IN_OUT } from "@/lib/motion";
 import { CrestMark } from "./CrestMark";
+import { CrackPanels, type CrackY } from "./CrackPanels";
 
 type Phase = "hidden" | "intro" | "closing" | "done";
 
 const TAGLINE = "TOGETHER WE SAIL";
 
-/** First-visit-only intro: crest draws in, tagline staggers up, curtain opens. */
+// Total runtime: crackPanel (in) + crackHold + crackPanelExit = 2.5s.
+const HOLD_MS = (DURATION.crackPanel + DURATION.crackHold) * 1000;
+const DONE_MS = HOLD_MS + DURATION.crackPanelExit * 1000;
+
+/** Plays on every full page load/reload — the screen cracks shut, holds on the crest, then cracks open (right up, left down). */
 export function Preloader() {
   const reducedMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("hidden");
 
   useEffect(() => {
-    let alreadyShown = true;
-    try {
-      alreadyShown = sessionStorage.getItem(SESSION_PRELOADER_KEY) === "1";
-      if (!alreadyShown) sessionStorage.setItem(SESSION_PRELOADER_KEY, "1");
-    } catch {
-      // sessionStorage unavailable (private mode / disabled) — skip preloader, don't block render.
-      alreadyShown = true;
-    }
-
-    if (alreadyShown) return;
     if (reducedMotion) {
       setPhase("done");
       return;
     }
 
     setPhase("intro");
-    const closeTimer = setTimeout(() => setPhase("closing"), 1900);
-    const doneTimer = setTimeout(() => setPhase("done"), 1900 + 700);
+    const closeTimer = setTimeout(() => setPhase("closing"), HOLD_MS);
+    const doneTimer = setTimeout(() => setPhase("done"), DONE_MS);
     return () => {
       clearTimeout(closeTimer);
       clearTimeout(doneTimer);
@@ -50,26 +45,25 @@ export function Preloader() {
   if (phase === "hidden" || phase === "done") return null;
 
   const closing = phase === "closing";
+  const rightY: CrackY = closing ? "-100%" : "0%";
+  const leftY: CrackY = closing ? "100%" : "0%";
 
   return (
     <div className="fixed inset-0 z-[200]" aria-hidden="true">
-      <motion.div
-        className="absolute inset-0 bg-brand-ink"
-        style={{ clipPath: "polygon(0 100%, 40% 100%, 80% 0, 0 0)" }}
-        animate={{ y: closing ? "-100%" : "0%" }}
-        transition={{ duration: 0.6, ease: EASE_IN_OUT }}
-      />
-      <motion.div
-        className="absolute inset-0 bg-brand-red"
-        style={{ clipPath: "polygon(0 100%, 60% 100%, 100% 0, 0 0)" }}
-        animate={{ y: closing ? "-100%" : "0%" }}
-        transition={{ duration: 0.6, ease: EASE_IN_OUT, delay: closing ? 0.08 : 0 }}
+      <CrackPanels
+        rightY={rightY}
+        leftY={leftY}
+        transition={{
+          duration: closing ? DURATION.crackPanelExit : DURATION.crackPanel,
+          ease: EASE_IN_OUT,
+        }}
       />
 
       <motion.div
         className="absolute inset-0 flex flex-col items-center justify-center gap-8"
+        initial={{ opacity: 0 }}
         animate={{ opacity: closing ? 0 : 1 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.3, delay: closing ? 0 : DURATION.crackPanel * 0.6 }}
       >
         <CrestMark className="h-24 w-24 text-brand-sand" />
         <div className="flex overflow-hidden">
@@ -82,10 +76,10 @@ export function Preloader() {
                 transition={{
                   duration: 0.6,
                   ease: EASE_REVEAL,
-                  delay: 0.9 + i * 0.03,
+                  delay: DURATION.crackPanel + 0.2 + i * 0.025,
                 }}
               >
-                {char === " " ? " " : char}
+                {char === " " ? " " : char}
               </motion.span>
             </span>
           ))}

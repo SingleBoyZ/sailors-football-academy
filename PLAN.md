@@ -61,10 +61,31 @@ Vitest + Playwright.
 10. Polish — done: sitemap/robots/OG image, an accessibility contrast pass
     verified with a real Lighthouse audit (90/100/100/100 mobile), and 3
     Playwright smoke tests (1 passes standalone; 2 need a live seeded DB).
+11. **Mock-data mode** — done (historical): `src/lib/data` repository
+    abstraction with a Prisma-backed implementation and an in-memory mock
+    one, switched by `USE_MOCK_DATA`. See phase 12.
+12. **Supabase migration** — done: replaced Auth.js (NextAuth v5) with
+    Supabase Auth (`@supabase/ssr`, email/password + Google OAuth), moved
+    the database to Supabase Postgres with the canonical schema in
+    `supabase/migrations/0001_init.sql` (enums, tables, FKs, indexes,
+    `on_auth_user_created` → `profiles` trigger, RLS with per-user
+    `cart_items` policies), removed the mock data layer entirely
+    (`mock.ts`/`fixtures.ts`/`USE_MOCK_DATA` gone, next-auth/bcrypt
+    uninstalled), and added a persisted per-user cart (`cart_items` table,
+    server-side merge of the guest cart on login, debounced sync via
+    `<CartSync />`). Admin approval of enrolments provisions guardians via
+    the Supabase Admin API; the emailed set-password flow writes the
+    password to Supabase Auth while keeping the existing
+    `verification_tokens` mechanics. The mock payment gateways remain as a
+    dev-only fallback behind `ENABLE_MOCK_GATEWAY`. Auth.js `Account` /
+    `Session` models were dropped from the Prisma schema (sessions live in
+    Supabase auth); `User` is now mapped to `profiles` with the Supabase
+    UUID as its id.
 
-See README.md for the full go-live checklist and deployment guide, and its
-"Assumptions and scope notes" section for every deliberate deviation from
-the brief's literal spec and why.
+See README.md for the full go-live checklist and deployment guide, its
+"Running in mock mode" section, and its "Assumptions and scope notes"
+section for every deliberate deviation from the brief's literal spec and
+why.
 
 ## Notes / assumptions carried into the build
 - No real photos/crest exist yet — placeholders + README manifest telling the

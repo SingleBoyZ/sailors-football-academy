@@ -11,10 +11,11 @@ type TransitionLinkProps = LinkProps &
   };
 
 /**
- * Drop-in replacement for next/link on internal navigation: plays the red
- * curtain wipe (see RouteTransitionOverlay) before/after the route changes.
- * External links, downloads, and modified clicks (cmd/ctrl/middle) fall
- * through to a plain navigation.
+ * Drop-in replacement for next/link on internal navigation: plays the
+ * crack-open wipe (see RouteTransitionOverlay) only when the destination is
+ * the home page — every other internal link navigates normally, instantly.
+ * External links, downloads, and modified clicks (cmd/ctrl/middle) always
+ * fall through to a plain navigation too.
  */
 export function TransitionLink({ href, children, onClick, ...rest }: TransitionLinkProps) {
   const pathname = usePathname();
@@ -26,6 +27,7 @@ export function TransitionLink({ href, children, onClick, ...rest }: TransitionL
     if (event.defaultPrevented) return;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     if (targetPath === pathname) return;
+    if (targetPath !== "/") return;
 
     event.preventDefault();
     startTransition(targetPath);

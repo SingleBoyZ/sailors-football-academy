@@ -22,7 +22,8 @@ export default function AchievementsPage() {
       <PageHeader
         eyebrow="Honours"
         title="Achievements"
-        description="Hardworking, united, fearless — the results since 2023."
+        description="Hardworking, united, fearless. The results since 2023."
+        backgroundImage={MEDIA.achievementsBanner}
       />
 
       <section className="bg-brand-white py-20 sm:py-28">
@@ -62,8 +63,8 @@ export default function AchievementsPage() {
           <Reveal className="relative lg:col-span-5">
             <div className="relative aspect-4/3 w-full">
               <Image
-                src={MEDIA.u18Squad}
-                alt="U18 Performance squad"
+                src={MEDIA.fivePlayerCelebration}
+                alt="Sailors players celebrating together"
                 fill
                 className="object-cover"
                 sizes="(min-width: 1024px) 40vw, 90vw"

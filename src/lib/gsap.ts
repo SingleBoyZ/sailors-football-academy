@@ -13,6 +13,11 @@ let registered = false;
 export function syncGsapWithLenis() {
   if (!registered) {
     gsap.registerPlugin(ScrollTrigger);
+    // GSAP's own tab-visibility "catch up" smoothing fights with Lenis
+    // driving the same scroll position — disabling it is the standard fix
+    // recommended for any Lenis + ScrollTrigger pairing, and matters most
+    // on scrubbed/pinned sections like the horizontal pathway.
+    gsap.ticker.lagSmoothing(0);
     registered = true;
   }
 

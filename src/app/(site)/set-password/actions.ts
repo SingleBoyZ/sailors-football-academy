@@ -1,9 +1,8 @@
 "use server";
 
-import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { consumeSetPasswordToken } from "@/lib/tokens";
+import { db } from "@/lib/data";
+import { setAuthUserPassword } from "@/lib/auth/provision";
 
 const schema = z.object({
   email: z.string().trim().email(),
@@ -13,6 +12,10 @@ const schema = z.object({
 
 export type SetPasswordResult = { ok: true } | { ok: false; error: string };
 
+/**
+ * Redeems an emailed set-password token: the password itself is written to
+ * Supabase Auth (the identity store) via the admin API, never to Prisma.
+ */
 export async function setPassword(input: {
   email: string;
   token: string;
@@ -24,18 +27,21 @@ export async function setPassword(input: {
   }
   const { email, token, password } = parsed.data;
 
-  const valid = await consumeSetPasswordToken(email, token);
+  const valid = await db.consumeSetPasswordToken(email, token);
   if (!valid) {
     return { ok: false, error: "This link is invalid or has expired. Ask the academy to resend it." };
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await db.getUserByEmail(email);
   if (!user) {
     return { ok: false, error: "No account found for this email." };
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+  try {
+    await setAuthUserPassword(user.id, password);
+  } catch {
+    return { ok: false, error: "Couldn't set your password — please try again in a moment." };
+  }
 
   return { ok: true };
 }

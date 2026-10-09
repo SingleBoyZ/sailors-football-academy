@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { MarkFulfilledButton } from "@/components/admin/MarkFulfilledButton";
 import { formatSenCompact } from "@/lib/money";
@@ -10,7 +10,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function OrderDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const order = await prisma.order.findUnique({ where: { id }, include: { items: true } });
+  const order = await db.getOrderById(id);
   if (!order) notFound();
 
   const address = order.address as { line1: string; line2?: string; city: string; state: string; postcode: string } | null;

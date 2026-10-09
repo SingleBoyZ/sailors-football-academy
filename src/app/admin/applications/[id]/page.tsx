@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { ApplicationReviewActions } from "@/components/admin/ApplicationReviewActions";
 import { ageGroupFromDob } from "@/lib/age";
@@ -19,7 +19,7 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 
 export default async function ApplicationDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const application = await prisma.application.findUnique({ where: { id } });
+  const application = await db.getApplicationById(id);
   if (!application) notFound();
 
   const ageGroup = ageGroupFromDob(application.dob);

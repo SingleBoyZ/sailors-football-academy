@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Container } from "@/components/ui/Container";
 import { StoryCard } from "@/components/success-stories/StoryCard";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Success Stories",
@@ -13,16 +13,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function SuccessStoriesPage() {
-  const stories = await prisma.successStory
-    .findMany({
-      where: { published: true },
-      orderBy: { createdAt: "desc" },
-      select: { slug: true, playerName: true, ageGroup: true, quote: true, image: true },
-    })
-    .catch((error: unknown) => {
-      console.error("SuccessStoriesPage: failed to load stories", error);
-      return [];
-    });
+  const stories = await db.getSuccessStories({ published: true }).catch((error: unknown) => {
+    console.error("SuccessStoriesPage: failed to load stories", error);
+    return [];
+  });
 
   return (
     <>

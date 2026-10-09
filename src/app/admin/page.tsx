@@ -1,63 +1,18 @@
 import { ClipboardList, Users, Wallet, AlertTriangle } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { db, type DashboardStats } from "@/lib/data";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import { CollectionsChart, type CollectionsChartPoint } from "@/components/admin/CollectionsChart";
+import { CollectionsChart } from "@/components/admin/CollectionsChart";
 import { formatSenCompact } from "@/lib/money";
 
 export const dynamic = "force-dynamic";
 
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-async function loadDashboard() {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-
-  const [pendingApplications, activePlayers, monthPayments, openInvoices, recentPayments, chartPayments] =
-    await Promise.all([
-      prisma.application.count({ where: { status: "PENDING" } }),
-      prisma.player.count({ where: { active: true } }),
-      prisma.payment.findMany({ where: { status: "PAID", paidAt: { gte: monthStart } }, select: { amount: true } }),
-      prisma.invoice.findMany({ where: { status: { not: "SETTLED" } }, select: { amountDue: true, amountPaid: true } }),
-      prisma.payment.findMany({
-        orderBy: { createdAt: "desc" },
-        take: 8,
-        include: { player: true, order: true },
-      }),
-      prisma.payment.findMany({
-        where: { status: "PAID", paidAt: { gte: sixMonthsAgo } },
-        select: { amount: true, paidAt: true },
-      }),
-    ]);
-
-  const thisMonthCollectedSen = monthPayments.reduce((sum, p) => sum + p.amount, 0);
-  const outstandingTotalSen = openInvoices.reduce((sum, inv) => sum + (inv.amountDue - inv.amountPaid), 0);
-
-  const chartMap = new Map<string, number>();
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    chartMap.set(`${d.getFullYear()}-${d.getMonth()}`, 0);
-  }
-  for (const p of chartPayments) {
-    if (!p.paidAt) continue;
-    const key = `${p.paidAt.getFullYear()}-${p.paidAt.getMonth()}`;
-    if (chartMap.has(key)) chartMap.set(key, (chartMap.get(key) ?? 0) + p.amount);
-  }
-  const chartData: CollectionsChartPoint[] = Array.from(chartMap.entries()).map(([key, totalSen]) => {
-    const month = Number(key.split("-")[1]);
-    return { month: MONTH_NAMES[month], totalSen };
-  });
-
-  return { pendingApplications, activePlayers, thisMonthCollectedSen, outstandingTotalSen, recentPayments, chartData };
-}
-
 export default async function AdminDashboardPage() {
-  let data: Awaited<ReturnType<typeof loadDashboard>> | null = null;
+  let data: DashboardStats | null = null;
   let loadError = false;
 
   try {
-    data = await loadDashboard();
+    data = await db.getDashboardStats();
   } catch (error) {
     console.error("AdminDashboardPage: failed to load", error);
     loadError = true;

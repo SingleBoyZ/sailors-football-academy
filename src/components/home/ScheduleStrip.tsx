@@ -49,6 +49,11 @@ export function ScheduleStrip() {
                 ))}
               </tbody>
             </table>
+            <p className="font-display text-brand-red mt-10 text-2xl leading-snug sm:text-3xl">
+              &ldquo;The kick-off of a new voyage.
+              <br />
+              Together we sail.&rdquo;
+            </p>
           </Reveal>
         </div>
       </Container>

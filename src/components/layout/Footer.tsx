@@ -1,10 +1,9 @@
 import Image from "next/image";
-import { MessageCircle } from "lucide-react";
-import { InstagramGlyph } from "@/components/ui/icons";
+import { InstagramGlyph, WhatsAppGlyph } from "@/components/ui/icons";
 import { TransitionLink } from "@/components/motion/TransitionLink";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { SITE, NAV_LINKS } from "@/content/site";
+import { SITE, HEADER_NAV_LINKS } from "@/content/site";
 
 const LEGAL_LINKS = [
   { href: "/privacy", label: "Privacy Policy" },
@@ -26,14 +25,14 @@ export function Footer() {
           <p className="text-brand-white/70 max-w-xs text-sm">{SITE.tagline}</p>
           <p className="font-display text-brand-red-light text-sm">{SITE.hashtag}</p>
           <Button href={SITE.contact.whatsappHref} variant="outline" size="md" className="w-fit">
-            <MessageCircle className="h-4 w-4" />
+            <WhatsAppGlyph className="h-4 w-4" />
             WhatsApp Us
           </Button>
         </div>
 
         <nav className="flex flex-col gap-3 lg:col-span-2" aria-label="Footer">
           <span className="text-brand-white/50 text-xs tracking-wide uppercase">Explore</span>
-          {NAV_LINKS.map((link) => (
+          {HEADER_NAV_LINKS.map((link) => (
             <TransitionLink
               key={link.href}
               href={link.href}
@@ -68,7 +67,7 @@ export function Footer() {
             rel="noreferrer"
             className="text-brand-white/80 hover:text-brand-red-light flex items-center gap-2 text-sm transition-colors"
           >
-            <MessageCircle className="h-4 w-4" /> {SITE.contact.whatsappDisplay}
+            <WhatsAppGlyph className="h-4 w-4" /> {SITE.contact.whatsappDisplay}
           </a>
           <div className="mt-2 flex flex-col">
             {LEGAL_LINKS.map((link) => (
@@ -92,7 +91,7 @@ export function Footer() {
             <iframe
               src={mapSrc}
               title={`Map to ${SITE.location.venue}`}
-              className="h-full w-full grayscale invert-[0.92]"
+              className="h-full w-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />

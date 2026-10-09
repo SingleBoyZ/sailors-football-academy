@@ -2,16 +2,18 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { TransitionLink } from "@/components/motion/TransitionLink";
+import { MEDIA } from "@/content/media";
+import { mergeGuestCartIntoServer } from "@/lib/cart-merge";
 import { registerParent } from "./actions";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -34,25 +36,41 @@ export default function RegisterPage() {
       return;
     }
 
-    const signInResult = await signIn("credentials", {
-      email: input.email,
-      password: input.password,
-      redirect: false,
-    });
-
-    setSubmitting(false);
-    if (signInResult?.error) {
-      setError("Account created — please sign in.");
-      router.push("/login");
+    if (!result.confirmed) {
+      // Email confirmation is enabled on the project — the account exists,
+      // the user just needs to click the Supabase confirmation email first.
+      setAwaitingConfirmation(true);
+      setSubmitting(false);
       return;
     }
+
+    await mergeGuestCartIntoServer();
     router.push("/portal");
     router.refresh();
   }
 
+  if (awaitingConfirmation) {
+    return (
+      <>
+        <PageHeader eyebrow="Portal" title="Check Your Inbox" backgroundImage={MEDIA.pathway2} />
+        <Container className="py-16 sm:py-24">
+          <div className="mx-auto max-w-sm text-center">
+            <p className="text-brand-muted text-sm">
+              Your account is created. We&apos;ve sent a confirmation link to your email address — click it,
+              then sign in here.
+            </p>
+            <Button href="/login" className="mt-8">
+              Go to Sign In
+            </Button>
+          </div>
+        </Container>
+      </>
+    );
+  }
+
   return (
     <>
-      <PageHeader eyebrow="Portal" title="Create a Parent Account" />
+      <PageHeader eyebrow="Portal" title="Create a Parent Account" backgroundImage={MEDIA.pathway2} />
       <Container className="py-16 sm:py-24">
         <form onSubmit={handleSubmit} className="mx-auto flex max-w-sm flex-col gap-4">
           <label className="flex flex-col gap-1.5 text-sm">

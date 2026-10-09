@@ -3,6 +3,7 @@ import Image from "next/image";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Reveal } from "@/components/motion/Reveal";
 import { Timeline } from "@/components/academy/Timeline";
+import { InstagramFeed } from "@/components/academy/InstagramFeed";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { ABOUT_COPY, PHILOSOPHY, HOME_GROUND } from "@/content/history";
@@ -20,7 +21,8 @@ export default function AcademyPage() {
       <PageHeader
         eyebrow="The Academy"
         title="Our Story"
-        description="From a club founded in 2023 to a structured U6–U18 pathway — this is how Sailors Football Academy came to be."
+        description="From a club founded in 2023 to a structured U6–U18 pathway. This is how Sailors Football Academy came to be."
+        backgroundImage={MEDIA.academyBanner}
       />
 
       <section className="bg-brand-white py-20 sm:py-28">
@@ -35,6 +37,7 @@ export default function AcademyPage() {
                   </p>
                 ))}
               </div>
+              <InstagramFeed />
             </Reveal>
           </div>
           <div className="lg:col-span-7">
@@ -53,8 +56,8 @@ export default function AcademyPage() {
           <Reveal delay={0.15} className="relative lg:col-span-6">
             <div className="relative aspect-4/3 w-full">
               <Image
-                src={MEDIA.academyKids}
-                alt="Foundation Programme players training"
+                src={MEDIA.u16Squad}
+                alt="Sailors U16 squad"
                 fill
                 className="object-cover"
                 sizes="(min-width: 1024px) 40vw, 90vw"
@@ -69,7 +72,7 @@ export default function AcademyPage() {
           <Reveal className="relative order-2 lg:order-1 lg:col-span-6">
             <div className="relative aspect-4/3 w-full">
               <Image
-                src={MEDIA.pitchRimbayu}
+                src={MEDIA.footballPitch}
                 alt="FootballHub Rimbayu pitch"
                 fill
                 className="object-cover"

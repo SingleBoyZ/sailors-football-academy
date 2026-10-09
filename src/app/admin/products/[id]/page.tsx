@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { VariantManager } from "@/components/admin/VariantManager";
@@ -10,7 +10,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const product = await prisma.product.findUnique({ where: { id }, include: { variants: { orderBy: { label: "asc" } } } });
+  const product = await db.getProductById(id);
   if (!product) notFound();
 
   return (

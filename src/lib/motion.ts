@@ -14,8 +14,9 @@ export const DURATION = {
   base: 0.5,
   reveal: 0.7,
   slow: 0.9,
-  curtainPanel: 0.6,
-  curtainHold: 0.25,
+  crackPanel: 0.5,
+  crackPanelExit: 0.7,
+  crackHold: 1.3,
   preloaderLetters: 0.8,
 } as const;
 
@@ -24,8 +25,6 @@ export const STAGGER = {
   base: 0.08,
   loose: 0.14,
 } as const;
-
-export const SESSION_PRELOADER_KEY = "sfa-preloader-shown";
 
 export const revealTransition = {
   duration: DURATION.reveal,

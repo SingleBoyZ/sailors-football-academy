@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -11,7 +12,9 @@ import {
   Package,
   Star,
   Settings,
+  LogOut,
 } from "lucide-react";
+import { signOutAction } from "@/lib/auth/actions";
 import { TransitionLink } from "@/components/motion/TransitionLink";
 import { cn } from "@/lib/utils";
 
@@ -57,9 +60,16 @@ export function Sidebar() {
         })}
       </nav>
       <div className="border-t border-brand-ink/10 p-3">
-        <TransitionLink href="/" className="text-brand-muted hover:text-brand-ink block px-3 py-2 text-xs">
+        <Link href="/" className="text-brand-muted hover:text-brand-ink block px-3 py-2 text-xs">
           &larr; Back to site
-        </TransitionLink>
+        </Link>
+        <button
+          type="button"
+          onClick={() => void signOutAction()}
+          className="text-brand-muted hover:text-brand-ink flex w-full items-center gap-2 px-3 py-2 text-xs"
+        >
+          <LogOut className="h-3.5 w-3.5" /> Sign Out
+        </button>
       </div>
     </aside>
   );

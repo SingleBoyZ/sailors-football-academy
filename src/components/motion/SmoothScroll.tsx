@@ -18,9 +18,12 @@ export function SmoothScroll() {
   useEffect(() => {
     if (reducedMotion) return;
 
+    // lerp-based (continuous re-targeting each frame) instead of a fixed
+    // duration+easing tween — duration-based smoothing feels disconnected
+    // from fast or direction-changing input, which reads as "stuck"/laggy
+    // even with a perfectly healthy frame rate.
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.1,
       smoothWheel: true,
     });
     setLenis(lenis);

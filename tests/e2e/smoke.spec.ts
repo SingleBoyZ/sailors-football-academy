@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("home page loads with hero content", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /set sail/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sailors Football Academy" })).toBeVisible();
   await expect(page.getByText("#KASITEMPUR").first()).toBeVisible();
 });
 

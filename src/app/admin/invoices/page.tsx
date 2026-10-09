@@ -1,40 +1,13 @@
-import type { ColumnDef } from "@tanstack/react-table";
-import { prisma } from "@/lib/prisma";
-import { DataTable } from "@/components/admin/DataTable";
-import { StatusBadge } from "@/components/admin/StatusBadge";
+import { db } from "@/lib/data";
 import { GenerateInvoicesButton } from "@/components/admin/GenerateInvoicesButton";
-import { formatSenCompact } from "@/lib/money";
-import type { InvoiceStatus, PaymentType } from "@prisma/client";
+import { InvoicesTable, type InvoiceRow } from "./InvoicesTable";
 
 export const dynamic = "force-dynamic";
 
-type Row = {
-  id: string;
-  player: string;
-  type: PaymentType;
-  period: string;
-  amountDueSen: number;
-  amountPaidSen: number;
-  status: InvoiceStatus;
-};
-
-const columns: ColumnDef<Row, unknown>[] = [
-  { accessorKey: "player", header: "Player" },
-  { accessorKey: "type", header: "Type" },
-  { accessorKey: "period", header: "Period" },
-  { accessorKey: "amountDueSen", header: "Due", cell: ({ getValue }) => formatSenCompact(getValue() as number) },
-  { accessorKey: "amountPaidSen", header: "Paid", cell: ({ getValue }) => formatSenCompact(getValue() as number) },
-  { accessorKey: "status", header: "Status", cell: ({ getValue }) => <StatusBadge status={getValue() as string} /> },
-];
-
 export default async function InvoicesPage() {
-  const invoices = await prisma.invoice.findMany({
-    orderBy: [{ periodYear: "desc" }, { periodMonth: "desc" }],
-    include: { player: true },
-    take: 500,
-  });
+  const invoices = await db.getAllInvoices();
 
-  const rows: Row[] = invoices.map((inv) => ({
+  const rows: InvoiceRow[] = invoices.map((inv) => ({
     id: inv.id,
     player: inv.player.name,
     type: inv.type,
@@ -58,7 +31,7 @@ export default async function InvoicesPage() {
         <GenerateInvoicesButton />
       </div>
 
-      <DataTable columns={columns} data={rows} searchPlaceholder="Search invoices…" />
+      <InvoicesTable rows={rows} />
     </div>
   );
 }

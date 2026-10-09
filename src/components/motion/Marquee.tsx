@@ -1,30 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useScrollVelocity } from "@/store/scroll-velocity";
 import { cn } from "@/lib/utils";
-
-const BASE_DURATION_S = 20;
-const MIN_DURATION_S = 5;
 
 type MarqueeProps = {
   text: string;
   className?: string;
 };
 
-/** Infinite red marquee band whose speed nudges up with Lenis scroll velocity. */
+/**
+ * Infinite red marquee band — a pure CSS keyframe loop (see --animate-marquee
+ * in globals.css) at one fixed, constant speed. Deliberately has no JS
+ * animation loop and no scroll/wheel listeners of any kind: page scrolling
+ * must never affect this animation's speed.
+ */
 export function Marquee({ text, className }: MarqueeProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    return useScrollVelocity.subscribe((state) => {
-      const track = trackRef.current;
-      if (!track) return;
-      const duration = Math.max(MIN_DURATION_S, BASE_DURATION_S - state.velocity * 1.5);
-      track.style.animationDuration = `${duration}s`;
-    });
-  }, []);
-
   return (
     <div
       className={cn(
@@ -33,7 +22,7 @@ export function Marquee({ text, className }: MarqueeProps) {
       )}
       aria-hidden="true"
     >
-      <div ref={trackRef} className="animate-marquee inline-flex w-max">
+      <div className="animate-marquee inline-flex w-max">
         {[0, 1].map((copy) => (
           <span
             key={copy}

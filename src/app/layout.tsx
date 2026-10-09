@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { Anton, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/content/site";
-import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider";
 
 const anton = Anton({
   variable: "--font-anton",
@@ -46,9 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="en"
       className={`${anton.variable} ${jakarta.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-brand-sand text-brand-ink">
-        <AuthSessionProvider>{children}</AuthSessionProvider>
-      </body>
+      <body className="min-h-full flex flex-col bg-brand-sand text-brand-ink">{children}</body>
     </html>
   );
 }

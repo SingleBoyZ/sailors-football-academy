@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { isDevGatewayEnabled } from "@/lib/payments/dev-gateway";
 
 const BASE_URL =
   process.env.BILLPLZ_SANDBOX === "true"
@@ -30,7 +31,7 @@ export type BillplzBill = {
   reference_1?: string;
 };
 
-type CreateBillInput = {
+export type CreateBillInput = {
   collectionId: string;
   email: string;
   name: string;
@@ -71,6 +72,21 @@ export async function createBill(input: CreateBillInput): Promise<BillplzBill> {
   }
 
   return res.json();
+}
+
+/**
+ * Creates a Billplz bill, or — only when ENABLE_MOCK_GATEWAY=true — a fake
+ * bill that redirects to the local mock gateway page at `mockPath`.
+ */
+export async function createBillWithDevFallback(
+  input: CreateBillInput & { mockPath: string },
+): Promise<{ id: string; url: string }> {
+  if (isDevGatewayEnabled()) {
+    const billId = `mock-${crypto.randomUUID()}`;
+    return { id: billId, url: `${input.mockPath}?billId=${billId}` };
+  }
+  const bill = await createBill(input);
+  return { id: bill.id, url: bill.url };
 }
 
 /**

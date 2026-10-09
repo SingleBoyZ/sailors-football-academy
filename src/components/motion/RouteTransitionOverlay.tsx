@@ -7,16 +7,22 @@ import { useRouteTransition, type TransitionPhase } from "@/store/route-transiti
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { DURATION, EASE_IN_OUT } from "@/lib/motion";
 import { CrestMark } from "./CrestMark";
+import { CrackPanels, type CrackY } from "./CrackPanels";
 
-const SAFETY_TIMEOUT_MS = 2500;
+const SAFETY_TIMEOUT_MS = 4500;
 
-function panelY(phase: TransitionPhase): string {
-  if (phase === "covering" || phase === "held") return "0%";
-  if (phase === "revealing") return "-100%";
-  return "100%";
+/** Right panel always exits up, left panel always exits down. */
+function rightPanelY(phase: TransitionPhase): CrackY {
+  return phase === "covering" || phase === "held" ? "0%" : "-100%";
+}
+function leftPanelY(phase: TransitionPhase): CrackY {
+  return phase === "covering" || phase === "held" ? "0%" : "100%";
 }
 
-/** Full-screen red curtain wipe played between route changes — see TransitionLink. */
+/**
+ * Full-screen crack-open wipe played only when navigating back to the home
+ * page (see TransitionLink) — every other internal link navigates normally.
+ */
 export function RouteTransitionOverlay() {
   const router = useRouter();
   const pathname = usePathname();
@@ -29,14 +35,14 @@ export function RouteTransitionOverlay() {
     if (phase === "held") heldAt.current = performance.now();
   }, [phase]);
 
-  // Reveal only once the new route has actually rendered AND the curtain
-  // has held for at least DURATION.curtainHold, whichever finishes last.
+  // Reveal only once the new route has actually rendered AND the crack has
+  // held for at least DURATION.crackHold, whichever finishes last.
   useEffect(() => {
     if (phase !== "held" || !targetHref) return;
     if (pathname !== targetHref.split(/[?#]/)[0]) return;
 
     const elapsed = performance.now() - (heldAt.current ?? performance.now());
-    const remaining = Math.max(0, DURATION.curtainHold * 1000 - elapsed);
+    const remaining = Math.max(0, DURATION.crackHold * 1000 - elapsed);
     const timer = setTimeout(() => setPhase("revealing"), remaining);
     return () => clearTimeout(timer);
   }, [pathname, phase, targetHref, setPhase]);
@@ -72,6 +78,7 @@ export function RouteTransitionOverlay() {
   }
 
   const active = phase !== "idle";
+  const exiting = phase === "revealing";
 
   return (
     <div
@@ -79,15 +86,14 @@ export function RouteTransitionOverlay() {
       style={{ pointerEvents: active ? "auto" : "none" }}
       aria-hidden={!active}
     >
-      <motion.div
-        className="absolute inset-0 bg-brand-red"
-        style={{ clipPath: "polygon(0 100%, 60% 100%, 100% 0, 0 0)" }}
-        animate={{ y: panelY(phase) }}
+      <CrackPanels
+        rightY={rightPanelY(phase)}
+        leftY={leftPanelY(phase)}
         transition={{
-          duration: phase === "idle" ? 0 : DURATION.curtainPanel,
+          duration: phase === "idle" ? 0 : exiting ? DURATION.crackPanelExit : DURATION.crackPanel,
           ease: EASE_IN_OUT,
         }}
-        onAnimationComplete={() => {
+        onRightAnimationComplete={() => {
           if (phase === "covering") {
             router.push(targetHref!);
             setPhase("held");
@@ -95,16 +101,6 @@ export function RouteTransitionOverlay() {
           if (phase === "revealing") {
             reset();
           }
-        }}
-      />
-      <motion.div
-        className="absolute inset-0 bg-brand-ink"
-        style={{ clipPath: "polygon(0 100%, 40% 100%, 80% 0, 0 0)" }}
-        animate={{ y: panelY(phase) }}
-        transition={{
-          duration: phase === "idle" ? 0 : DURATION.curtainPanel,
-          ease: EASE_IN_OUT,
-          delay: phase === "covering" ? 0.08 : 0,
         }}
       />
       <motion.div

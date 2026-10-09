@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { formatSenCompact } from "@/lib/money";
 import { parseRinggitToSen } from "@/lib/money";
+import { MEDIA } from "@/content/media";
 import { lookupPlayer, createFeeBill, type PlayerPaymentSummary } from "./actions";
 
 export default function PayPage() {
@@ -75,7 +76,12 @@ export default function PayPage() {
 
   return (
     <>
-      <PageHeader eyebrow="Fees" title="Pay Fees" description="Enter your player's member code or your registered email to get started." />
+      <PageHeader
+        eyebrow="Fees"
+        title="Pay Fees"
+        description="Enter your player's member code or your registered email to get started."
+        backgroundImage={MEDIA.footballPitch}
+      />
       <Container className="py-16 sm:py-24">
         <div className="mx-auto max-w-lg">
           {!player ? (

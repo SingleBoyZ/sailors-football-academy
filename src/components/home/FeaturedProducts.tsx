@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { ProductCard } from "@/components/store/ProductCard";
@@ -6,17 +6,10 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 
 export async function FeaturedProducts() {
-  const products = await prisma.product
-    .findMany({
-      where: { active: true },
-      orderBy: { createdAt: "desc" },
-      take: 4,
-      select: { slug: true, name: true, category: true, priceSen: true, images: true },
-    })
-    .catch((error: unknown) => {
-      console.error("FeaturedProducts: failed to load products", error);
-      return [];
-    });
+  const products = await db.getFeaturedProducts(4).catch((error: unknown) => {
+    console.error("FeaturedProducts: failed to load products", error);
+    return [];
+  });
 
   if (products.length === 0) return null;
 

@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Deep navy — primary brand color */
+  --color-navy-50: #f0f4fa;
+  --color-navy-100: #dbe4f0;
+  --color-navy-200: #b3c6e0;
+  --color-navy-300: #7f9dc7;
+  --color-navy-400: #4d70a3;
+  --color-navy-500: #2e4d7d;
+  --color-navy-600: #1f3760;
+  --color-navy-700: #172a4a;
+  --color-navy-800: #0f1d34;
+  --color-navy-900: #0a1424;
+  --color-navy-950: #060c17;
+
+  /* Refined gold/amber — accent color */
+  --color-gold-50: #fdf8ec;
+  --color-gold-100: #faedc9;
+  --color-gold-200: #f4da97;
+  --color-gold-300: #edc25e;
+  --color-gold-400: #e3a935;
+  --color-gold-500: #cc8f24;
+  --color-gold-600: #a8711c;
+  --color-gold-700: #82551a;
+  --color-gold-800: #6a451c;
+  --color-gold-900: #5a3a1c;
+
+  --shadow-card: 0 1px 2px rgba(10, 20, 36, 0.04), 0 8px 24px -8px rgba(10, 20, 36, 0.12);
+  --shadow-card-hover: 0 4px 8px rgba(10, 20, 36, 0.06), 0 16px 32px -12px rgba(10, 20, 36, 0.18);
+
+  --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-fade-in-up: fade-in-up 0.7s ease-out both;
+  --animate-scale-in: scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-navy-900 antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  ::selection {
+    @apply bg-gold-200 text-navy-900;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

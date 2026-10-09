@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Quote } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -12,12 +12,10 @@ export const dynamic = "force-dynamic";
 type PageParams = { params: Promise<{ slug: string }> };
 
 async function getStory(slug: string) {
-  return prisma.successStory
-    .findUnique({ where: { slug } })
-    .catch((error: unknown) => {
-      console.error("SuccessStoryPage: failed to load story", error);
-      return null;
-    });
+  return db.getSuccessStory(slug).catch((error: unknown) => {
+    console.error("SuccessStoryPage: failed to load story", error);
+    return null;
+  });
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {

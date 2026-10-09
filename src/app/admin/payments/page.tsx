@@ -1,41 +1,11 @@
-import type { ColumnDef } from "@tanstack/react-table";
-import { prisma } from "@/lib/prisma";
-import { DataTable } from "@/components/admin/DataTable";
-import { StatusBadge } from "@/components/admin/StatusBadge";
+import { db } from "@/lib/data";
 import { ExportCsvButton } from "@/components/admin/ExportCsvButton";
 import { TransitionLink } from "@/components/motion/TransitionLink";
-import { formatSenCompact } from "@/lib/money";
 import { cn } from "@/lib/utils";
-import type { PaymentStatus, PaymentType } from "@prisma/client";
+import type { PaymentStatus } from "@prisma/client";
+import { PaymentsTable, type PaymentRow } from "./PaymentsTable";
 
 export const dynamic = "force-dynamic";
-
-type Row = {
-  id: string;
-  date: string;
-  for: string;
-  type: PaymentType;
-  amountSen: number;
-  status: PaymentStatus;
-  billplzBillId: string;
-};
-
-const columns: ColumnDef<Row, unknown>[] = [
-  { accessorKey: "date", header: "Date" },
-  { accessorKey: "for", header: "For" },
-  { accessorKey: "type", header: "Type" },
-  {
-    accessorKey: "amountSen",
-    header: "Amount",
-    cell: ({ getValue }) => formatSenCompact(getValue() as number),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ getValue }) => <StatusBadge status={getValue() as string} />,
-  },
-  { accessorKey: "billplzBillId", header: "Billplz ID" },
-];
 
 const STATUS_FILTERS: { label: string; value: PaymentStatus | "ALL" }[] = [
   { label: "All", value: "ALL" },
@@ -50,14 +20,9 @@ export default async function PaymentsPage({ searchParams }: PageProps) {
   const { status } = await searchParams;
   const filter = (status as PaymentStatus | undefined) ?? undefined;
 
-  const payments = await prisma.payment.findMany({
-    where: filter ? { status: filter } : undefined,
-    orderBy: { createdAt: "desc" },
-    include: { player: true, order: true },
-    take: 500,
-  });
+  const payments = await db.getPayments(filter ? { status: filter } : undefined);
 
-  const rows: Row[] = payments.map((p) => ({
+  const rows: PaymentRow[] = payments.map((p) => ({
     id: p.id,
     date: p.createdAt.toLocaleDateString("en-MY"),
     for: p.player?.name ?? p.order?.customerName ?? p.payerName,
@@ -98,7 +63,7 @@ export default async function PaymentsPage({ searchParams }: PageProps) {
         ))}
       </div>
 
-      <DataTable columns={columns} data={rows} searchPlaceholder="Search payments…" />
+      <PaymentsTable rows={rows} />
     </div>
   );
 }

@@ -34,14 +34,14 @@ export function StoreGrid({ products, categories }: { products: ProductCardData[
               key={c}
               onClick={() => setCategory(c)}
               className={cn(
-                "relative px-4 py-2 text-sm tracking-wide uppercase transition-colors",
+                "relative isolate px-4 py-2 text-sm tracking-wide uppercase transition-colors",
                 category === c ? "text-brand-white" : "text-brand-muted hover:text-brand-ink",
               )}
             >
               {category === c && (
                 <motion.span layoutId="store-category-pill" className="bg-brand-ink absolute inset-0 -z-10" />
               )}
-              {c}
+              <span className="relative">{c}</span>
             </button>
           ))}
         </div>
@@ -65,7 +65,11 @@ export function StoreGrid({ products, categories }: { products: ProductCardData[
       {filtered.length === 0 ? (
         <p className="text-brand-muted">No products in this category yet.</p>
       ) : (
-        <Stagger as="div" className="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
+        // Keyed by category so switching filters remounts this container fresh — Stagger's
+        // scroll-reveal only ever fires once per instance (viewport once: true), so without a
+        // fresh instance, cards that get filtered out and later filtered back in would remount
+        // after that one-time trigger already fired and stay stuck at their hidden opacity.
+        <Stagger key={category} as="div" className="grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
           {filtered.map((product) => (
             <StaggerItem key={product.slug}>
               <ProductCard product={product} />

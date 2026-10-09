@@ -20,8 +20,8 @@ export function WhoWeAre() {
         <Reveal delay={0.15} className="relative lg:col-span-7">
           <div className="relative aspect-4/5 w-full max-w-lg lg:ml-auto">
             <Image
-              src={MEDIA.trainingSession}
-              alt="Sailors Football Academy training session"
+              src={MEDIA.trainingPhoto}
+              alt="Sailors Football Academy players challenging for the ball in a match"
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 40vw, 90vw"

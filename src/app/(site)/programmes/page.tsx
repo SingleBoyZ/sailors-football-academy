@@ -5,7 +5,8 @@ import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Container } from "@/components/ui/Container";
 import { HorizontalPathway } from "@/components/programmes/HorizontalPathway";
 import { PhaseTabs } from "@/components/programmes/PhaseTabs";
-import { PROGRAMMES, PLACEMENT_CRITERIA } from "@/content/programmes";
+import { PROGRAMMES } from "@/content/programmes";
+import { MEDIA } from "@/content/media";
 
 export const metadata: Metadata = {
   title: "Programmes",
@@ -18,7 +19,8 @@ export default function ProgrammesPage() {
       <PageHeader
         eyebrow="The Pathway"
         title="Programmes"
-        description="Scroll through the full pathway — from a child's first touch to first-team football."
+        description="Scroll through the full pathway, from a child's first touch to first-team football."
+        backgroundImage={MEDIA.programmesBanner}
       />
 
       <HorizontalPathway />
@@ -51,28 +53,6 @@ export default function ProgrammesPage() {
                   <span className="text-brand-red-dark text-sm tracking-wide uppercase">{programme.ageRange}</span>
                 </div>
                 <p className="text-brand-muted mt-2 text-sm">{programme.summary}</p>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </Container>
-      </section>
-
-      <section className="bg-brand-ink py-20 sm:py-28">
-        <Container>
-          <Reveal>
-            <p className="font-display text-brand-red-light mb-4 text-sm tracking-[0.3em]">Placement</p>
-            <h2 className="font-display text-brand-white max-w-2xl text-4xl leading-[0.95] sm:text-5xl">
-              How We Decide Where a Player Trains
-            </h2>
-          </Reveal>
-          <Stagger as="div" className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {PLACEMENT_CRITERIA.map((criterion, i) => (
-              <StaggerItem
-                key={criterion}
-                className="border-brand-white/15 flex items-center gap-4 border p-5"
-              >
-                <span className="font-display text-brand-red text-2xl">{String(i + 1).padStart(2, "0")}</span>
-                <span className="text-brand-white text-base">{criterion}</span>
               </StaggerItem>
             ))}
           </Stagger>

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { requireAdmin } from "@/lib/require-admin";
 
 const settingsSchema = z.object({
@@ -19,13 +19,8 @@ export async function updateSettings(input: SettingsInput): Promise<ActionResult
   await requireAdmin();
   const parsed = settingsSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
-  const data = parsed.data;
 
-  await prisma.$transaction(
-    Object.entries(data).map(([key, value]) =>
-      prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } }),
-    ),
-  );
+  await db.updateSettings(parsed.data);
 
   revalidatePath("/admin/settings");
   return { ok: true };

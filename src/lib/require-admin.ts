@@ -1,9 +1,9 @@
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 
 /**
  * Defense-in-depth for admin Server Actions — middleware already blocks
- * unauthenticated/non-admin navigation to /admin/**, but actions are worth
- * guarding directly too since they're invoked as RPCs, not page loads.
+ * unauthenticated navigation to /admin/**, but actions are worth guarding
+ * directly too since they're invoked as RPCs, not page loads.
  */
 export async function requireAdmin() {
   const session = await auth();

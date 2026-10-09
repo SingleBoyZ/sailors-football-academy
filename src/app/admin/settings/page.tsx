@@ -1,4 +1,4 @@
-import { getSetting } from "@/lib/settings";
+import { db } from "@/lib/data";
 import { SettingsForm } from "@/components/admin/SettingsForm";
 import { FEES } from "@/content/schedule";
 
@@ -6,10 +6,10 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const [sponsoredMonthlyFeeSen, shippingSen, whatsappNumber, bannerText] = await Promise.all([
-    getSetting("sponsoredMonthlyFeeSen", FEES.sponsoredSen),
-    getSetting("shippingSen", 800),
-    getSetting("whatsappNumber", "60175681830"),
-    getSetting("bannerText", ""),
+    db.getSetting("sponsoredMonthlyFeeSen", FEES.sponsoredSen),
+    db.getSetting("shippingSen", 800),
+    db.getSetting("whatsappNumber", "60175681830"),
+    db.getSetting("bannerText", ""),
   ]);
 
   return (

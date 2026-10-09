@@ -5,6 +5,20 @@
  * Swap files in place (keep filenames) and nothing in the app needs to change.
  */
 export const MEDIA = {
+  /** Real photos (not placeholders) — swap these files directly to update. */
+  heroBackground: "/assets/hero-bg.jpg",
+  trainingPhoto: "/assets/training-photo.jpg",
+  academyBanner: "/assets/academy-banner.jpg",
+  footballPitch: "/assets/football-pitch.png",
+  u16Squad: "/assets/u16.jpg",
+  programmesBanner: "/assets/programmes-banner.jpg",
+  pathway1: "/assets/pathway-01.jpg",
+  pathway2: "/assets/pathway-02.jpg",
+  pathway3: "/assets/pathway-03.jpg",
+  pathway4: "/assets/pathway-04.jpg",
+  pathway5: "/assets/pathway-05.jpg",
+  achievementsBanner: "/assets/achievements-banner.jpg",
+  fivePlayerCelebration: "/assets/five-player.jpeg",
   heroCelebration: "/placeholders/hero-celebration.svg",
   teamSCL2025: "/placeholders/team-scl-2025.svg",
   pitchRimbayu: "/placeholders/pitch-rimbayu.svg",

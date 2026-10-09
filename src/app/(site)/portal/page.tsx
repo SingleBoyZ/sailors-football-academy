@@ -1,41 +1,109 @@
-import { Download } from "lucide-react";
-import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
-import { getOutstandingForPlayer } from "@/lib/fees";
+// src/app/(site)/portal/page.tsx
+
+import { Download, Users, Wallet, CalendarClock, AlertTriangle } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/data";
+import { formatSenCompact } from "@/lib/money";
+import { PLAN_LABELS } from "@/lib/plan";
+import { TRAINING_SCHEDULE } from "@/content/schedule";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { formatSenCompact } from "@/lib/money";
+import { TransitionLink } from "@/components/motion/TransitionLink";
+import { CrestMark } from "@/components/motion/CrestMark";
+import type { PlayerWithPayments, Application } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-export default async function PortalPage() {
+type PageProps = { searchParams: Promise<{ notice?: string }> };
+
+function upcomingSessionsFor(ageGroup: string) {
+  return TRAINING_SCHEDULE.flatMap((block) =>
+    block.rows
+      .filter((row) => row.ageGroups.split(",").map((s) => s.trim()).includes(ageGroup))
+      .map((row) => ({ heading: block.heading, ...row })),
+  );
+}
+
+export default async function PortalPage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session) return null; // middleware already guards this route
+  const { notice } = await searchParams;
 
-  const [players, pendingApplications] = await Promise.all([
-    prisma.player.findMany({
-      where: { guardianId: session.user.id },
-      include: { payments: { orderBy: { createdAt: "desc" } } },
-      orderBy: { joinedAt: "desc" },
-    }),
-    prisma.application.findMany({
-      where: { guardianEmail: session.user.email ?? "", status: "PENDING" },
-      orderBy: { submittedAt: "desc" },
-    }),
-  ]);
+  let players: PlayerWithPayments[] = [];
+  let pendingApplications: Application[] = [];
+  let outstandingMap = new Map<string, number>();
+  let dbError = false;
 
-  const outstandingByPlayer = new Map<string, number>();
-  for (const player of players) {
-    outstandingByPlayer.set(player.id, await getOutstandingForPlayer(player.id));
+  try {
+    [players, pendingApplications] = await Promise.all([
+      db.getPlayersForUser(session.user.id),
+      db.getPendingApplicationsForGuardianEmail(session.user.email ?? ""),
+    ]);
+
+    if (players.length > 0) {
+      outstandingMap = await db.getOutstandingForPlayers(players.map((p) => p.id));
+    }
+  } catch (error) {
+    console.error("PortalPage database error:", error);
+    dbError = true;
   }
+
+  const totalOutstanding = [...outstandingMap.values()].reduce((sum, v) => sum + v, 0);
+
+  const lastPaymentDate = players
+    .flatMap((p) => p.payments)
+    .filter((pay) => pay.status === "PAID" && pay.paidAt)
+    .map((pay) => pay.paidAt as Date)
+    .sort((a, b) => b.getTime() - a.getTime())[0];
+
+  const firstName = session.user.name?.trim().split(/\s+/)[0] || "Sailor";
 
   return (
     <>
-      <PageHeader eyebrow="Portal" title={`Welcome, ${session.user.name?.split(" ")[0] ?? "Sailor"}`} />
+      <PageHeader eyebrow="Portal" title={`Welcome aboard, ${firstName}`} />
       <Container className="py-16 sm:py-24">
+        {dbError && (
+          <div className="mb-8 flex items-center gap-3 border border-brand-warning/30 bg-brand-warning/10 p-4 text-sm text-brand-ink">
+            <AlertTriangle className="h-5 w-5 shrink-0 text-brand-warning" />
+            <p>
+              We are currently unable to reach the database. Your account is logged in, but please verify your <code>DATABASE_URL</code> and Supabase database connection.
+            </p>
+          </div>
+        )}
+
+        {notice === "admin-denied" && (
+          <div className="mb-8 border border-brand-warning/30 bg-brand-warning/10 p-4 text-sm">
+            You don&apos;t have admin access — here&apos;s your parent portal instead.
+          </div>
+        )}
+
+        <div className="mb-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="relative overflow-hidden border border-brand-ink/10 p-5">
+            <CrestMark animate={false} className="absolute -right-4 -bottom-4 h-24 w-24 text-brand-ink/10" />
+            <div className="relative mb-2 flex items-center gap-2 text-xs tracking-wide uppercase text-brand-muted">
+              <Users className="h-4 w-4" /> Players Enrolled
+            </div>
+            <p className="font-display relative text-2xl">{players.length}</p>
+          </div>
+          <div className="border border-brand-ink/10 p-5">
+            <div className="mb-2 flex items-center gap-2 text-xs tracking-wide uppercase text-brand-muted">
+              <Wallet className="h-4 w-4" /> Total Outstanding
+            </div>
+            <p className={`font-display text-2xl ${totalOutstanding > 0 ? "text-brand-red" : ""}`}>
+              {formatSenCompact(totalOutstanding)}
+            </p>
+          </div>
+          <div className="border border-brand-ink/10 p-5">
+            <div className="mb-2 flex items-center gap-2 text-xs tracking-wide uppercase text-brand-muted">
+              <CalendarClock className="h-4 w-4" /> Last Payment
+            </div>
+            <p className="font-display text-2xl">{lastPaymentDate ? lastPaymentDate.toLocaleDateString("en-MY") : "—"}</p>
+          </div>
+        </div>
+
         {pendingApplications.length > 0 && (
-          <div className="border-brand-warning/30 bg-brand-warning/10 mb-10 border p-5">
+          <div className="mb-10 border border-brand-warning/30 bg-brand-warning/10 p-5">
             {pendingApplications.map((app) => (
               <p key={app.id} className="text-sm">
                 <strong>{app.playerName}</strong>&apos;s application is under review — we&apos;ll email you
@@ -47,97 +115,48 @@ export default async function PortalPage() {
 
         {players.length === 0 && pendingApplications.length === 0 && (
           <div className="text-center">
-            <p className="text-brand-muted mb-6">No players linked to this account yet.</p>
+            <p className="mb-6 text-brand-muted">No players linked to this account yet.</p>
             <Button href="/enrol">Start an Enrolment</Button>
           </div>
         )}
 
-        <div className="flex flex-col gap-12">
-          {players.map((player) => {
-            const outstanding = outstandingByPlayer.get(player.id) ?? 0;
-            return (
-              <section key={player.id} className="border border-brand-ink/10">
-                <div className="bg-brand-sand flex flex-wrap items-center justify-between gap-4 p-6">
-                  <div>
-                    <p className="text-brand-muted text-xs tracking-wide uppercase">{player.memberCode}</p>
-                    <h2 className="font-display text-2xl">{player.name}</h2>
-                    <p className="text-brand-muted mt-1 text-sm">
-                      {player.programme} &middot; {player.ageGroup}
-                      {!player.active && <span className="text-brand-red"> &middot; Inactive</span>}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-brand-muted text-xs tracking-wide uppercase">Outstanding</p>
-                    <p className={`font-display text-2xl ${outstanding > 0 ? "text-brand-red" : "text-brand-success"}`}>
-                      {formatSenCompact(outstanding)}
-                    </p>
-                    {outstanding > 0 && (
-                      <Button href={`/pay?query=${player.memberCode}`} size="md" className="mt-2">
-                        Pay Now
-                      </Button>
-                    )}
-                  </div>
-                </div>
+        {players.length > 0 && (
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="font-display text-2xl">My Players</h2>
+            <TransitionLink href="/portal/profile" className="text-sm text-brand-red-dark underline">
+              Edit my profile
+            </TransitionLink>
+          </div>
+        )}
 
-                <div className="p-6">
-                  <h3 className="font-display mb-3 text-lg">Payment History</h3>
-                  {player.payments.length === 0 ? (
-                    <p className="text-brand-muted text-sm">No payments yet.</p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full min-w-100 text-sm">
-                        <thead>
-                          <tr className="text-brand-muted border-b border-brand-ink/10 text-left">
-                            <th className="py-2 font-normal">Date</th>
-                            <th className="py-2 font-normal">Type</th>
-                            <th className="py-2 font-normal">Amount</th>
-                            <th className="py-2 font-normal">Status</th>
-                            <th className="py-2 font-normal">Receipt</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {player.payments.map((payment) => (
-                            <tr key={payment.id} className="border-b border-brand-ink/5">
-                              <td className="py-2">
-                                {(payment.paidAt ?? payment.createdAt).toLocaleDateString("en-MY")}
-                              </td>
-                              <td className="py-2">{payment.type.replace("_", " ")}</td>
-                              <td className="py-2">{formatSenCompact(payment.amount)}</td>
-                              <td className="py-2">
-                                <span
-                                  className={
-                                    payment.status === "PAID"
-                                      ? "text-brand-success-dark"
-                                      : payment.status === "FAILED"
-                                        ? "text-brand-red"
-                                        : "text-brand-warning-dark"
-                                  }
-                                >
-                                  {payment.status}
-                                </span>
-                              </td>
-                              <td className="py-2">
-                                {payment.status === "PAID" && payment.receiptNo ? (
-                                  <a
-                                    href={`/api/receipts/${payment.id}`}
-                                    className="text-brand-red inline-flex items-center gap-1 underline"
-                                  >
-                                    <Download className="h-3.5 w-3.5" /> {payment.receiptNo}
-                                  </a>
-                                ) : (
-                                  "—"
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+        <div className="flex flex-col gap-10">
+          {players.map((player) => (
+            <section key={player.id} className="border border-brand-ink/10">
+              <div className="flex flex-wrap items-start justify-between gap-4 bg-brand-sand p-6">
+                <div>
+                  <p className="text-xs tracking-wide uppercase text-brand-muted">{player.memberCode}</p>
+                  <TransitionLink href={`/portal/players/${player.memberCode}`} className="font-display block text-2xl hover:underline">
+                    {player.name}
+                  </TransitionLink>
+                  <p className="mt-1 text-sm text-brand-muted">
+                    {player.ageGroup} &middot; {player.programme}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="bg-brand-ink px-2 py-0.5 text-xs tracking-wide uppercase text-brand-white">
+                      {PLAN_LABELS[player.plan]}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 text-xs tracking-wide uppercase ${
+                        player.active ? "bg-brand-success/15 text-brand-success-dark" : "bg-brand-red/15 text-brand-red-dark"
+                      }`}
+                    >
+                      {player.active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
                 </div>
-              </section>
-            );
-          })}
+              </div>
+            </section>
+          ))}
         </div>
       </Container>
     </>

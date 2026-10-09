@@ -7,6 +7,7 @@ import { FaqAccordion } from "@/components/training/FaqAccordion";
 import { TRAINING_SCHEDULE, FEES } from "@/content/schedule";
 import { formatSenCompact } from "@/lib/money";
 import { SITE } from "@/content/site";
+import { MEDIA } from "@/content/media";
 
 export const metadata: Metadata = {
   title: "Training & Fees",
@@ -22,6 +23,7 @@ export default function TrainingPage() {
         eyebrow="Training & Fees"
         title="The Schedule"
         description="Every session runs at FootballHub Rimbayu — weeknights and weekends, across every age group."
+        backgroundImage={MEDIA.pathway4}
       />
 
       <section className="bg-brand-white py-20 sm:py-28">

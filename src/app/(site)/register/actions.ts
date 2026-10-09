@@ -1,11 +1,17 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/data";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
+import { createSupabaseServer } from "@/lib/supabase/server";
 
-export type RegisterResult = { ok: true } | { ok: false; error: string };
+export type RegisterResult = { ok: true; confirmed: boolean } | { ok: false; error: string };
 
+/**
+ * Creates the parent account in Supabase Auth (the on_auth_user_created
+ * trigger materialises their profiles row from user_metadata). When the
+ * project has email confirmation enabled there is no session yet — the UI
+ * then asks the user to check their inbox instead of proceeding.
+ */
 export async function registerParent(input: RegisterInput): Promise<RegisterResult> {
   const parsed = registerSchema.safeParse(input);
   if (!parsed.success) {
@@ -13,15 +19,24 @@ export async function registerParent(input: RegisterInput): Promise<RegisterResu
   }
   const data = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { email: data.email } });
+  const existing = await db.getUserByEmail(data.email);
   if (existing) {
     return { ok: false, error: "An account with this email already exists. Try signing in instead." };
   }
 
-  const passwordHash = await bcrypt.hash(data.password, 12);
-  await prisma.user.create({
-    data: { name: data.name, email: data.email, phone: data.phone, passwordHash, role: "PARENT" },
+  const supabase = await createSupabaseServer();
+  const { data: signUpData, error } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+    options: { data: { name: data.name, phone: data.phone } },
   });
 
-  return { ok: true };
+  if (error) {
+    if (/already registered/i.test(error.message)) {
+      return { ok: false, error: "An account with this email already exists. Try signing in instead." };
+    }
+    return { ok: false, error: "Couldn't create your account — please try again in a moment." };
+  }
+
+  return { ok: true, confirmed: !!signUpData.session };
 }
