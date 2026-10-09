@@ -4,7 +4,6 @@ import { createBillWithDevFallback } from "@/lib/billplz";
 import { provisionGuardian } from "@/lib/auth/provision";
 import { generateOrderNo } from "@/lib/codes";
 import { monthlyFeeForPlan } from "@/lib/plan";
-import { renderReceiptPdf } from "@/lib/pdf/receipt";
 import { sendEmail } from "@/lib/email/send";
 import { allocateAmountToInvoices, outstandingForInvoices, invoiceDescription, type AllocatableInvoice } from "@/lib/payments/allocate";
 import { FEES } from "@/content/schedule";
@@ -69,6 +68,10 @@ async function sendFeeReceiptEmail(paymentId: string): Promise<void> {
   if (!payment || !payment.player || payment.status !== "PAID" || !payment.receiptNo) return;
 
   try {
+    // Loaded lazily so the PDF library is never pulled into pages that only
+    // need the data layer (e.g. /portal) — it crashed serverless on Vercel.
+    const { renderReceiptPdf } = await import("@/lib/pdf/receipt");
+
     const pendingBalance = await outstandingForPlayerId(payment.player.id);
     const pdf = await renderReceiptPdf({
       receiptNo: payment.receiptNo,
@@ -280,7 +283,7 @@ export const prismaRepo: DataRepository = {
   async getOutstandingForPlayer(playerId) {
     return outstandingForPlayerId(playerId);
   },
-   async getOutstandingForPlayers(playerIds) {
+  async getOutstandingForPlayers(playerIds) {
     if (!playerIds || playerIds.length === 0) {
       return new Map<string, number>();
     }

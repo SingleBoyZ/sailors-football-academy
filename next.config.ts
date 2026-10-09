@@ -5,6 +5,10 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   : undefined;
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["@react-pdf/renderer", "pdfkit", "fontkit"],
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/pdfkit/js/**/*"],
+  },
   images: {
     remotePatterns: [
       ...(supabaseHost
