@@ -4,6 +4,10 @@
     "app": {
       "root": ".",
       "framework": "nextjs"
+    },
+    "bookie": {
+      "root": "bookie",
+      "framework": "vite"
     }
   },
   "rewrites": [
