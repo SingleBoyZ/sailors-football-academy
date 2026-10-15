@@ -181,7 +181,7 @@ function AccountLink({ user, className, onNavigate }: { user: NavUser; className
   const label = user
     ? user.role === "ADMIN"
       ? "Admin"
-      : user.role === "COACH"
+      : (user.role as string) === "COACH"
         ? "Coach Portal"
         : "Portal"
     : "Login / Sign Up";
