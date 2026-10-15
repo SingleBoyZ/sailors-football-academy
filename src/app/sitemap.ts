@@ -4,6 +4,7 @@ import { SITE } from "@/content/site";
 
 const STATIC_ROUTES = [
   "",
+  "/about",
   "/academy",
   "/programmes",
   "/training",
