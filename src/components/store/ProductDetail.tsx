@@ -48,6 +48,7 @@ export function ProductDetail({ product }: { product: ProductDetailData }) {
       qty,
     );
     setAdded(true);
+    useCart.getState().open();
     setTimeout(() => setAdded(false), 1600);
   }
 

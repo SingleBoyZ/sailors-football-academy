@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/Button";
 import { formatSenCompact } from "@/lib/money";
 import { parseRinggitToSen } from "@/lib/money";
 import { MEDIA } from "@/content/media";
-import { lookupPlayer, createFeeBill, type PlayerPaymentSummary } from "./actions";
+import { lookupPlayer, createFeeBill, getMyChildren, type PlayerPaymentSummary } from "./actions";
 
 export default function PayPage() {
+  const [children, setChildren] = useState<PlayerPaymentSummary[]>([]);
+  const [selectedChild, setSelectedChild] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   const [query, setQuery] = useState("");
   const [player, setPlayer] = useState<PlayerPaymentSummary | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
@@ -44,6 +47,10 @@ export default function PayPage() {
       setQuery(prefill);
       runLookup(prefill);
     }
+    getMyChildren().then((list) => {
+      setChildren(list);
+      if (list.length > 0 && !prefill) setSelectedChild(list[0].playerId);
+    });
   }, []);
 
   async function handleLookup(event: FormEvent<HTMLFormElement>) {
@@ -84,8 +91,47 @@ export default function PayPage() {
       />
       <Container className="py-16 sm:py-24">
         <div className="mx-auto max-w-lg">
-          {!player ? (
+          {!player && children.length > 0 && !showSearch ? (
+            <div className="flex flex-col gap-4">
+              <label className="flex flex-col gap-1.5 text-sm">
+                <span>Select child to pay for</span>
+                <select
+                  value={selectedChild}
+                  onChange={(e) => setSelectedChild(e.target.value)}
+                  className="border border-brand-ink/15 bg-brand-white px-3 py-2.5"
+                >
+                  {children.map((c) => (
+                    <option key={c.playerId} value={c.playerId}>
+                      {c.name} ({c.ageGroup}) -{" "}
+                      {c.outstandingSen > 0 ? `${formatSenCompact(c.outstandingSen)} Due` : "Fully paid"}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => {
+                  const chosen = children.find((c) => c.playerId === selectedChild);
+                  if (chosen) {
+                    setPlayer(chosen);
+                    setPayerEmail(chosen.guardianEmail);
+                  }
+                }}
+              >
+                Continue
+              </Button>
+              <button type="button" onClick={() => setShowSearch(true)} className="text-brand-muted text-sm underline">
+                Paying for someone else? Search by member code or email
+              </button>
+            </div>
+          ) : !player ? (
             <form onSubmit={handleLookup} className="flex flex-col gap-4">
+              {children.length > 0 && (
+                <button type="button" onClick={() => setShowSearch(false)} className="text-brand-muted text-left text-sm underline">
+                  &larr; Back to my children
+                </button>
+              )}
               <label className="flex flex-col gap-1.5 text-sm">
                 <span>Member Code or Email</span>
                 <input

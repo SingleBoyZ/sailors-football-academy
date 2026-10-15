@@ -88,10 +88,33 @@ export default async function PortalPage({ searchParams }: PageProps) {
           </div>
         )}
 
-        {players.length === 0 && pendingApplications.length === 0 && (
-          <div className="text-center">
-            <p className="text-brand-muted mb-6">No players linked to this account yet.</p>
-            <Button href="/enrol">Start an Enrolment</Button>
+        {players.length === 0 && (
+          <div className="border-brand-ink/10 bg-brand-sand mb-10 border p-6 sm:p-8">
+            <h2 className="font-display text-2xl sm:text-3xl">Welcome to Sailors FA!</h2>
+            {pendingApplications.length === 0 ? (
+              <>
+                <p className="text-brand-muted mt-3 max-w-xl text-sm leading-relaxed">
+                  If you haven&apos;t enrolled your child yet, it only takes a few minutes. Your player, fees and
+                  schedule will appear here once they&apos;re approved.
+                </p>
+                <Button href="/enrol" className="mt-5">
+                  Start Enrolment Form &rarr;
+                </Button>
+              </>
+            ) : (
+              <p className="text-brand-muted mt-3 max-w-xl text-sm leading-relaxed">
+                Thanks for applying! Our staff are reviewing your application. You&apos;ll receive an email as soon
+                as it&apos;s approved, and your player will show up here.
+              </p>
+            )}
+            {pendingApplications.length > 0 && (
+              <p className="text-brand-muted mt-4 text-sm">
+                Enrolling a sibling too?{" "}
+                <TransitionLink href="/enrol" className="text-brand-red-dark underline">
+                  Start another enrolment
+                </TransitionLink>
+              </p>
+            )}
           </div>
         )}
 

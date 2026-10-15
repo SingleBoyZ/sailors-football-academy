@@ -18,7 +18,7 @@ export default function CheckoutPage() {
   const items = useCart((s) => s.items);
   const subtotal = cartTotalSen(items);
 
-  const [deliveryMethod, setDeliveryMethod] = useState<"DELIVERY" | "PICKUP">("PICKUP");
+  const [deliveryMethod, setDeliveryMethod] = useState<"DELIVERY" | "PICKUP" | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +28,11 @@ export default function CheckoutPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+
+    if (!deliveryMethod) {
+      setError("Please choose Pickup or Delivery.");
+      return;
+    }
 
     const formData = new FormData(event.currentTarget);
     const input = {
@@ -108,6 +113,18 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {deliveryMethod === null && (
+                <p className="text-brand-muted mt-3 text-sm">Please choose how you&apos;d like to receive your order.</p>
+              )}
+              {deliveryMethod === "PICKUP" && (
+                <p className="text-brand-muted mt-3 text-sm">
+                  Collect in person at FootballHub Rimbayu during weekend training sessions. Nothing will be
+                  couriered to you.
+                </p>
+              )}
+              {deliveryMethod === "DELIVERY" && (
+                <p className="text-brand-muted mt-3 text-sm">We&apos;ll courier your order to the address below.</p>
+              )}
               {deliveryMethod === "DELIVERY" && (
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <Field label="Address Line 1" name="line1" required className="sm:col-span-2" />
@@ -169,9 +186,11 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-brand-muted">
-                  {deliveryMethod === "DELIVERY" ? "Shipping (estimate)" : "Pickup"}
+                  {deliveryMethod === "DELIVERY" ? "Shipping (estimate)" : deliveryMethod === "PICKUP" ? "Pickup" : "Delivery"}
                 </span>
-                <span>{deliveryMethod === "DELIVERY" ? formatSenCompact(shipping) : "Free"}</span>
+                <span>
+                  {deliveryMethod === "DELIVERY" ? formatSenCompact(shipping) : deliveryMethod === "PICKUP" ? "Free" : "Choose an option"}
+                </span>
               </div>
               <div className="font-display flex justify-between text-lg">
                 <span>Total</span>

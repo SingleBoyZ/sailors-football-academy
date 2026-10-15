@@ -114,6 +114,29 @@ function LoginForm() {
 
   return (
     <div className="mx-auto max-w-sm">
+      <div role="tablist" className="mb-6 grid grid-cols-2 border border-brand-ink/15">
+        {[
+          { label: "Parent / Guardian", staff: false },
+          { label: "Academy Staff", staff: true },
+        ].map((tab) => (
+          <button
+            key={tab.label}
+            type="button"
+            role="tab"
+            aria-selected={adminMode === tab.staff}
+            onClick={() => {
+              setAdminMode(tab.staff);
+              setError(null);
+              setMessage(null);
+            }}
+            className={`px-3 py-3 text-sm font-semibold transition-colors ${
+              adminMode === tab.staff ? "bg-brand-ink text-brand-white" : "hover:bg-brand-sand"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
       {error && <p className="text-brand-red-dark text-sm mb-4">{error}</p>}
       {message && <p className="text-brand-success-dark text-sm mb-4">{message}</p>}
 
@@ -204,16 +227,6 @@ function LoginForm() {
       </Button>
         </>
       )}
-
-      <Button
-        type="button"
-        variant="secondary"
-        size="lg"
-        className="mt-3 w-full"
-        onClick={() => setAdminMode((v) => !v)}
-      >
-        {adminMode ? "Admin sign in: ON (opens admin panel)" : "Admin Sign In"}
-      </Button>
 
       <p className="text-brand-muted mt-8 text-center text-sm">
         New here?{" "}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { StepPlayer } from "./StepPlayer";
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
 const STEP_LABELS = ["Player", "Guardian", "Medical", "Review"];
+const DRAFT_KEY = "sfa-enrol-draft";
 const STEP_SCHEMAS = [playerDetailsSchema, guardianSchema, medicalConsentSchema, applicationSchema];
 
 function issuesToErrorMap(issues: { path: PropertyKey[]; message: string }[]): Record<string, string> {
@@ -33,9 +34,57 @@ export function EnrolForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Restore an in-progress draft (survives refresh / app switching on mobile).
+  // sessionStorage is used rather than localStorage so IC/medical details are
+  // dropped when the tab is closed.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { data?: Partial<EnrolFormData>; step?: number };
+        if (saved.data) setData({ ...EMPTY_ENROL_FORM, ...saved.data });
+        if (typeof saved.step === "number" && saved.step >= 0 && saved.step <= 3) setStep(saved.step);
+      }
+    } catch {
+      // ignore corrupt draft
+    }
+    setHydrated(true);
+  }, []);
+
+  // Save the draft as the parent types.
+  useEffect(() => {
+    if (!hydrated || done) return;
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ data, step }));
+    } catch {
+      // storage unavailable (private mode / quota) — draft just isn't saved
+    }
+  }, [data, step, hydrated, done]);
 
   function update(patch: Partial<EnrolFormData>) {
     setData((d) => ({ ...d, ...patch }));
+  }
+
+  /** Start a fresh form for a sibling, keeping guardian + emergency contact details. */
+  function enrolAnotherChild() {
+    setData({
+      ...EMPTY_ENROL_FORM,
+      guardianName: data.guardianName,
+      guardianIc: data.guardianIc,
+      guardianPhone: data.guardianPhone,
+      guardianEmail: data.guardianEmail,
+      address: data.address,
+      emergencyName: data.emergencyName,
+      emergencyPhone: data.emergencyPhone,
+    });
+    setErrors({});
+    setSubmitError(null);
+    setDirection(-1);
+    setStep(0);
+    setDone(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goTo(target: number) {
@@ -72,6 +121,11 @@ export function EnrolForm() {
       setSubmitError(outcome.error);
       return;
     }
+    try {
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // ignore
+    }
     setDone(true);
   }
 
@@ -84,6 +138,9 @@ export function EnrolForm() {
           We&apos;ve emailed {data.guardianEmail} a confirmation. Our staff will review {data.playerName}&apos;s
           application and be in touch soon.
         </p>
+        <Button onClick={enrolAnotherChild} size="lg" variant="secondary" className="mt-8">
+          Enrol another child (+ keep guardian details)
+        </Button>
       </div>
     );
   }

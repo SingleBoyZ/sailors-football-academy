@@ -2,12 +2,35 @@
 
 import { redirect } from "next/navigation";
 import { db, type PlayerPaymentSummary } from "@/lib/data";
+import { auth } from "@/lib/auth";
 import { lookupPlayerSchema, createFeeBillSchema, type CreateFeeBillInput } from "@/lib/validations/pay";
 
 export type { PlayerPaymentSummary };
 export type LookupResult = { ok: true; player: PlayerPaymentSummary } | { ok: false; error: string };
 
 const NOT_FOUND_MESSAGE = "We couldn't find a player matching that member code or email.";
+
+/** Children of the signed-in parent (empty for guests), with outstanding balances. */
+export async function getMyChildren(): Promise<PlayerPaymentSummary[]> {
+  const session = await auth().catch(() => null);
+  if (!session) return [];
+
+  const players = await db.getPlayersForUser(session.user.id).catch(() => []);
+  const active = players.filter((p) => p.active);
+  if (active.length === 0) return [];
+
+  const outstanding = await db.getOutstandingForPlayers(active.map((p) => p.id));
+  return active.map((p) => ({
+    playerId: p.id,
+    name: p.name,
+    memberCode: p.memberCode,
+    programme: p.programme,
+    ageGroup: p.ageGroup,
+    monthlyFeeSen: p.monthlyFee,
+    outstandingSen: outstanding.get(p.id) ?? 0,
+    guardianEmail: session.user.email,
+  }));
+}
 
 export async function lookupPlayer(rawQuery: string): Promise<LookupResult> {
   const parsed = lookupPlayerSchema.safeParse({ query: rawQuery });
